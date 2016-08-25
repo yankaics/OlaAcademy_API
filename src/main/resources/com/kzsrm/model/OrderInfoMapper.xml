@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.OrderInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.OrderInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userId" property="userId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="tradeNo" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, tradeNo, userId, goodsId, type, status,createTime
+  </sql>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from orderInfo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="getByTradeNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from orderInfo
+    where tradeNo = #{tradeNo,jdbcType=VARCHAR} 
+  </select>
+  <select id="getByUserAndGoods" resultMap="BaseResultMap" >
+    select 
+    t.id, t.tradeNo, t.userId,t.goodsId, t.type, SUM(t.status) "status"
+    from orderInfo t
+    where t.userId = #{userId,jdbcType=INTEGER} 
+    and t.goodsId = #{goodsId,jdbcType=VARCHAR}
+    GROUP BY t.userId AND t.goodsId
+  </select>
+  <select id="getByUserAndStatus" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from orderInfo 
+    where userId = #{userId,jdbcType=INTEGER} 
+    and status = #{status,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from orderInfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.OrderInfo" >
+    insert into orderInfo (id, userId, type, tradeNo, goodsId, status,createTime)
+    values (#{id,jdbcType=INTEGER},#{userId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+    #{tradeNo,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.CheckInfo" >
+    update orderInfo
+    <set >
+      <if test="userId != null" >
+        userId = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goodsId = #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeNo != null" >
+        tradeNo = #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

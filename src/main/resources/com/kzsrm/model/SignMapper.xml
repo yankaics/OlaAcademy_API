@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kzsrm.model.SignMapper">
+	<resultMap id="signMap" type="com.kzsrm.model.Sign">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<id column="uid" jdbcType="INTEGER" property="uid" />
+		<result column="lastSignDay" jdbcType="TIMESTAMP" property="lastSignDay" />
+		<result column="startSignDay" jdbcType="TIMESTAMP" property="startSignDay" />
+		<result column="antCoin" jdbcType="INTEGER" property="antCoin" />
+		<result column="signNum" jdbcType="INTEGER" property="signNum" />
+		<!-- 充值所得蚂蚁币 -->
+		<result column="payCoin" jdbcType="INTEGER" property="payCoin" />
+		<result column="email" jdbcType="VARCHAR" property="email" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="signTotalNum" jdbcType="INTEGER" property="signTotalNum" />
+	</resultMap>
+	<!-- 添加打卡记录 -->
+	<insert id="insertSign" parameterType="map" keyProperty="id"
+		useGeneratedKeys="true">
+		insert into sign
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="uid != null and uid != ''">
+				uid,
+			</if>
+			<if test="startSignDay != null">
+				startSignDay,
+			</if>
+			<if test="lastSignDay != null">
+				lastSignDay,
+			</if>
+			<if test="antCoin != null">
+				antCoin,
+			</if>
+			<if test="signNum != null and signNum != ''">
+				signNum,
+			</if>
+			<if test="email != null">
+				email,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="signTotalNum != null and signTotalNum != ''">
+				signTotalNum,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="uid != null and uid != ''">
+				#{uid,jdbcType=INTEGER},
+			</if>
+			<if test="startSignDay != null">
+				#{startSignDay,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastSignDay != null">
+				#{lastSignDay,jdbcType=TIMESTAMP},
+			</if>
+			<if test="antCoin != null">
+				#{antCoin,jdbcType=INTEGER},
+			</if>
+			<if test="signNum != null and signNum != ''">
+				#{signNum,jdbcType=INTEGER},
+			</if>
+			<if test="email != null">
+				#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="signTotalNum != null and signTotalNum != ''">
+				#{signTotalNum,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 获取该用户今天是否已打卡 -->
+	<select id="getSignNum" parameterType="map" resultMap="signMap">
+		select *
+		from sign where email = #{email,jdbcType=INTEGER}
+		or phone =
+		#{phone,jdbcType=INTEGER} order by sendEmailTime desc limit 0,1
+	</select>
+
+	<update id="updateSign" parameterType="map">
+		update sign
+		<set>
+			<if test="signNum != null and signNum != ''">
+				signNum = #{signNum,jdbcType=INTEGER},
+			</if>
+			<if test="antCoin != null">
+				antCoin = #{antCoin,jdbcType=INTEGER},
+			</if>
+			<if test="payCoin != null and payCoin != ''">
+				payCoin = #{payCoin,jdbcType=INTEGER},
+			</if>
+			<if test="startSignDay != null">
+				startSignDay=#{startSignDay,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastSignDay != null">
+				lastSignDay = #{lastSignDay,jdbcType=TIMESTAMP},
+			</if>
+			signTotalNum = #{signTotalNum,jdbcType=INTEGER}
+			where email =
+			#{email,jdbcType=VARCHAR} or phone = #{phone,jdbcType=VARCHAR}
+		</set>
+	</update>
+	
+</mapper>

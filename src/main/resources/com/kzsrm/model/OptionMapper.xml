@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.OptionMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Option" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="isanswer" property="isanswer" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    t.id, t.sid, t.type, t.content, t.isanswer
+  </sql>
+  <sql id="Base_Table" >
+    t.id, t.sid, t.type, t.content, t.isanswer
+  </sql>
+  
+  <select id="getOptionBySubject" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select t.id, t.type, t.content, t.isanswer
+    from `option` t
+    where t.sid = #{subjectId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getRightOptionBySubject" resultMap="BaseResultMap" parameterType="map" >
+    select t.id, t.type, t.content
+    from `option` t
+    where t.sid = #{sid,jdbcType=INTEGER}
+    	and t.isanswer = #{isanswer,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from `option` t
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from `option` t
+    where t.id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from `option`
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.Option" >
+    insert into `option` (id, sid, type, 
+      content, isanswer)
+    values (#{id,jdbcType=INTEGER}, #{sid,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{isanswer,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.Option" >
+    insert into `option`
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="isanswer != null" >
+        isanswer,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="isanswer != null" >
+        #{isanswer,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.Option" >
+    update `option`
+    <set >
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="isanswer != null" >
+        isanswer = #{isanswer,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.Option" >
+    update `option`
+    set sid = #{sid,jdbcType=INTEGER},
+      type = #{type,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      isanswer = #{isanswer,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

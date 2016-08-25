@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.BannerMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Banner" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="objectId" property="objectId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, pic, type, url, objectId
+  </sql>
+  
+  <select id="getBannerList" resultMap="BaseResultMap" parameterType="map" >
+    select
+	<include refid="Base_Column_List" />
+	from banner 
+	order by createTime desc limit #{pageSize,jdbcType=INTEGER}
+  </select>
+</mapper>

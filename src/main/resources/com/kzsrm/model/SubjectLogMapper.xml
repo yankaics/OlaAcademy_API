@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.SubjectLogMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.SubjectLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="isright" property="isright" jdbcType="VARCHAR" />
+    <result column="oid" property="oid" jdbcType="VARCHAR" />
+    <result column="createTime" property="createtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sid, userid, isright, oid, createTime
+  </sql>
+  
+  <!-- 获取考点已做对的题数量 -->
+  <select id="getHasRightDoneSubNum" resultType="java.lang.Integer" parameterType="map" >
+    select count(distinct sl.sid)
+	from subjectLog sl ,course_subject cs
+	where sl.sid = cs.sid
+		and sl.isright ='1'
+		and sl.userid =#{userid,jdbcType=VARCHAR}
+		and cs.cid = #{cid,jdbcType=INTEGER}
+  </select>
+  <!-- 获取考点已做题数量 -->
+  <select id="getHasDoneSubNum" resultType="java.lang.Integer" parameterType="map" >
+    select count(distinct sl.sid)
+	from subjectLog sl ,course_subject cs
+	where sl.sid = cs.sid
+		and sl.userid =#{userid,jdbcType=VARCHAR}
+		and cs.cid = #{cid,jdbcType=INTEGER}
+  </select>
+  <!-- 按条件查询 -->
+  <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from subjectLog
+    <where>
+    	<if test="sid != null and sid != ''">
+    		sid = #{sid,jdbcType=VARCHAR}
+    	</if>
+    	<if test="userid != null and userid != ''">
+    		and userid = #{userid,jdbcType=VARCHAR}
+    	</if>
+    </where>
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from subjectLog
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.String" >
+    delete from subjectLog
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.SubjectLog" >
+    insert into subjectLog (id, sid, userid, 
+      isright, oid, createTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{sid,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, 
+      #{isright,jdbcType=VARCHAR}, #{oid,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.SubjectLog" >
+    insert into subjectLog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="isright != null" >
+        isright,
+      </if>
+      <if test="oid != null" >
+        oid,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="isright != null" >
+        #{isright,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        #{oid,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.SubjectLog" >
+    update subjectLog
+    <set >
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="isright != null" >
+        isright = #{isright,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        oid = #{oid,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.SubjectLog" >
+    update subjectLog
+    set sid = #{sid,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      isright = #{isright,jdbcType=VARCHAR},
+      oid = #{oid,jdbcType=VARCHAR},
+      createTime = #{createtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

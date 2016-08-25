@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kzsrm.model.YzmMapper">
+	<resultMap id="yzmMap" type="com.kzsrm.model.Yzm">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="email" jdbcType="INTEGER" property="email" />
+		<result column="yzm" jdbcType="VARCHAR" property="yzm" />
+		<result column="regtime" jdbcType="VARCHAR" property="regtime" />
+	</resultMap>
+	
+	<!--获取最新验证码  -->
+	<select id="selectOneYzm" parameterType="map" resultMap="yzmMap">
+		select *
+		from yzm where phone = #{phone} order by regtime desc
+		limit 0,1;
+	</select>
+	<!-- 添加验证码 -->
+	<insert id="insertYZM" parameterType="map"
+		keyProperty="id">
+		insert into yzm(id,phone,email,yzm,regtime)
+		values(#{id,jdbcType=INTEGER},#{phone,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{yzm,jdbcType=VARCHAR},#{regtime,jdbcType=VARCHAR})
+	</insert>
+</mapper>

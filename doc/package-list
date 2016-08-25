@@ -1,0 +1,9 @@
+com.kzsrm.baseservice
+com.kzsrm.controller
+com.kzsrm.dao
+com.kzsrm.interceptor
+com.kzsrm.model
+com.kzsrm.mybatis
+com.kzsrm.service
+com.kzsrm.serviceImpl
+com.kzsrm.utils

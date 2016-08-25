@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.TeacherMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Teacher" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="avatar" property="avatar" jdbcType="VARCHAR" />
+    <result column="profile" property="profile" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, profile, avatar
+  </sql>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from teacher
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from teacher
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.Teacher" >
+    insert into teacher (id, name, avatar, profile)
+    values (#{id,jdbcType=INTEGER}, #{oid,jdbcType=VARCHAR}, #{tid,jdbcType=VARCHAR}, #{tid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.Teacher" >
+    insert into teacher
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="avatar != null" >
+        avatar,
+      </if>
+      <if test="profile != null" >
+        profile,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="avatar != null" >
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="profile != null" >
+        #{profile,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.Teacher" >
+    update teacher
+    <set >
+      <if test="tid != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        profile = #{profile,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.Teacher" >
+    update teacher
+    set name = #{name,jdbcType=VARCHAR},
+      avatar = #{avatar,jdbcType=VARCHAR},
+      profile = #{profile,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.VideoMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Video" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="playcount" property="playCount" jdbcType="INTEGER" />
+    <result column="timespan" property="timeSpan" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="VARCHAR" />
+    <result column="orgname" property="orgname" jdbcType="VARCHAR" />
+    <result column="tname" property="tname" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="isfree" property="isfree" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    t.id, t.name, t.content, t.address, t.playcount, t.timespan, t.orgname, t.tname, t.pic, t.isfree
+  </sql>
+  <!-- 获取视频集下的视频 -->
+  <select id="getVideosByGoods" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from video t, goods_video gv
+    where t.id = gv.vid
+    	and gv.gid = #{gid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getVideoBySubject" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from video t, video_tag v, tag_subject s
+    where t.id = v.vid and v.tid = s.tid
+    	and s.sid = #{subjectId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getVideoByPoint" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" /> ,pv.weight
+    from video t, course_video pv, course p
+    where t.id = pv.vid and pv.cid = p.id
+    and p.id = #{pointId,jdbcType=VARCHAR}
+  </select>
+  <select id="getVideoListByPoint" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" /> ,pv.weight
+    from video t, course_video pv, course p
+    where t.id = pv.vid and pv.cid = p.id
+    and p.id = #{pointId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getVideoByTag" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from video t, video_tag vt, tag tag
+    where t.id = vt.vid and vt.tid = tag.id
+    and tag.name like #{keyword,jdbcType=VARCHAR}
+    union select 
+    <include refid="Base_Column_List" />
+    from video t where t.orgname like #{keyword,jdbcType=VARCHAR} 
+    or t.category like #{keyword,jdbcType=VARCHAR}
+    or t.tname like #{keyword,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from video t
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from video t
+    where t.id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from video
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.Video" >
+    insert into video (id, name, content, 
+      address, playcount, timespan)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{playCount,jdbcType=INTEGER}, #{timeSpan,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.Video" >
+    insert into video
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="address != null" >
+        playcount,
+      </if>
+      <if test="address != null" >
+        timespan,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{playCount,jdbcType=INTEGER},
+      </if>
+      <if test="address != null" >
+        #{timeSpan,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.Video" >
+    update video
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="playcount != null" >
+        playcount = #{playCount,jdbcType=VARCHAR},
+      </if>
+      <if test="timespan != null" >
+        timespan = #{timeSpan,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.Video" >
+    update video
+    set name = #{name,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      playcount = #{playCount,jdbcType=INTEGER},
+      timespan = #{timeSpan,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

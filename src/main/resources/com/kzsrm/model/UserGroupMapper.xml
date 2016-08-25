@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.UserGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.UserGroup" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="groupId" property="groupId" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, userId, groupId, createTime
+  </sql>
+  
+  <!-- 按条件查询 -->
+  <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_group
+    <where>
+    	<if test="groupId != null and groupId != ''">
+    		groupId = #{groupId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="userId != null and userId != ''">
+    		and userId = #{userId,jdbcType=VARCHAR}
+    	</if>
+    </where>
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_group
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.String" >
+    delete from user_group
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.UserGroup" >
+    insert into user_group (id, userId, groupId, createTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
+     #{groupId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.UserGroup" >
+    insert into user_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="groupId != null" >
+        groupId,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.UserGroup" >
+    update user_group
+    <set >
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="isright != null" >
+        isright = #{isright,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        oid = #{oid,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.UserGroup" >
+    update user_group
+    set sid = #{sid,jdbcType=VARCHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      isright = #{isright,jdbcType=VARCHAR},
+      oid = #{oid,jdbcType=VARCHAR},
+      createTime = #{createtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

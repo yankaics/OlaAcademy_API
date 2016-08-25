@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kzsrm.model.UserMapper">
+	<resultMap id="BaseResultMap" type="com.kzsrm.model.User">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="age" jdbcType="INTEGER" property="age" />
+		<result column="sex" jdbcType="VARCHAR" property="sex" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="passwd" jdbcType="VARCHAR" property="passwd" />
+		<result column="email" jdbcType="VARCHAR" property="email" />
+		<result column="local" jdbcType="VARCHAR" property="local" />
+		<result column="birthday" jdbcType="DATE" property="birthday"
+			javaType="java.util.Date" />
+		<result column="qq" jdbcType="VARCHAR" property="qq" />
+		<result column="sign" jdbcType="VARCHAR" property="sign" />
+		<result column="regtime" jdbcType="DATE" property="regtime"
+			javaType="java.util.Date" />
+		<result column="logintime" jdbcType="DATE" property="logintime"
+			javaType="java.util.Date" />
+		<result column="status" jdbcType="VARCHAR" property="status" />
+		<result column="avator" jdbcType="VARCHAR" property="avator" />
+		<result column="level" jdbcType="VARCHAR" property="level" />
+		<!-- <result column="regnum" jdbcType="INTEGER" property="regnum" /> -->
+		<!-- <result column="lastreg" jdbcType="VARCHAR" property="lastreg" /> -->
+		<result column="honor" jdbcType="VARCHAR" property="honor" />
+		<result column="learntime" jdbcType="VARCHAR" property="learntime" />
+		<result column="examtype" jdbcType="VARCHAR" property="examtype" />
+		<result column="vipTime" jdbcType="TIMESTAMP" property="vipTime" />
+		<result column="isActive" jdbcType="INTEGER" property="isActive" />
+		<result column="realName" jdbcType="VARCHAR" property="realName" />
+		<result column="infoPerfectLev" jdbcType="VARCHAR" property="infoPerfectLev" />
+
+		<result column="yzm" jdbcType="VARCHAR" property="yzm" />
+
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, name, age, sex, phone, email, local,
+		birthday,sign,
+		regtime,qq,
+		logintime,isActive,realName,infoPerfectLev,avator,sign,level,honor,learntime,isActive,realName,infoPerfectLev,
+		status,vipTime
+	</sql>
+
+	<select id="getUserBySessionId" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<!-- 根据手机号查询用户信息 -->
+	<select id="getByIdOrMobileOrEmail" parameterType="map"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where phone =
+		#{phone,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 用户登录 -->
+	<select id="userLogin" parameterType="map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where phone = #{phone,jdbcType=VARCHAR} and passwd = #{passwd,jdbcType=VARCHAR};
+	</select>
+
+	<!-- 根据手机号和邮箱查询用户信息 -->
+	<select id="selectUser" resultMap="BaseResultMap" parameterType="map">
+		select
+		id,name,sex,phone,passwd,email,birthday,qq,regtime,logintime,avator,sign,level,honor,learntime,status,examtype
+		from user
+		where phone = #{phone}
+	</select>
+
+	<!-- 根据id删除用户 -->
+	<delete id="deleteById" parameterType="java.lang.Integer">
+		delete from user
+		where id =
+		#{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="map" keyProperty="id"
+		useGeneratedKeys="true">
+		insert into user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="age != null and age != ''">
+				age,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="passwd != null">
+				passwd,
+			</if>
+			<if test="email != null">
+				email,
+			</if>
+			<if test="sign != null">
+				sign,
+			</if>
+			<if test="regtime != null">
+				regtime,
+			</if>
+			<if test="logintime != null">
+				logintime,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="isActive != null and isActive != ''">
+				isActive,
+			</if>
+		</trim>
+
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null and age!=''">
+				#{age,jdbcType=INTEGER},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="passwd != null">
+				#{passwd,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null">
+				#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="sign != null">
+				#{sign,jdbcType=VARCHAR},
+			</if>
+			<if test="regtime != null">
+				#{regtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="logintime != null">
+				#{logintime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=VARCHAR},
+			</if>
+			<if test="isActive != null and isActive != ''">
+				#{isActive,jdbcType=INTEGER}
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateById" parameterType="com.kzsrm.model.User">
+		update user
+		<set>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null and age!=''">
+				age = #{age,jdbcType=INTEGER},
+			</if>
+<!-- 			<if test="passwd != null">
+				passwd = #{passwd,jdbcType=VARCHAR},
+			</if>
+ -->			<if test="sex != null">
+				sex = #{sex,jdbcType=VARCHAR},
+			</if>
+			<!-- <if test="phone != null"> phone = #{phone,jdbcType=VARCHAR}, </if> -->
+			<if test="passwd != null">
+				passwd = #{passwd,jdbcType=VARCHAR},
+			</if>
+			<!-- <if test="email != null"> email = #{email,jdbcType=VARCHAR}, </if> -->
+			<if test="sign != null">
+				sign = #{sign,jdbcType=VARCHAR},
+			</if>
+			<if test="regtime != null">
+				regtime = #{regtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="logintime != null">
+				logintime = #{logintime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=VARCHAR},
+			</if>
+			<if test="birthday != null">
+				birthday = #{birthday,jdbcType=VARCHAR},
+			</if>
+			<if test="qq != null">
+				qq = #{qq,jdbcType=VARCHAR},
+			</if>
+			<if test="avator != null">
+				avator = #{avator,jdbcType=VARCHAR},
+			</if>
+			<if test="local != null">
+				local = #{local,jdbcType=VARCHAR},
+			</if>
+			<if test="level != null">
+				level = #{level,jdbcType=VARCHAR},
+			</if>
+			<if test="honor != null">
+				honor = #{honor,jdbcType=VARCHAR},
+			</if>
+			<if test="learntime != null">
+				learntime = #{learntime,jdbcType=VARCHAR},
+			</if>
+			<if test="examtype != null">
+				examtype = #{examtype,jdbcType=VARCHAR},
+			</if>
+			<if test="isActive != null and isActive != ''">
+				isActive = #{isActive,jdbcType=INTEGER},
+			</if>
+			<if test="realName != null">
+				realName = #{realName,jdbcType=VARCHAR},
+			</if>
+			<if test="infoPerfectLev != null">
+				infoPerfectLev = #{infoPerfectLev,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER} or phone = #{phone,jdbcType=VARCHAR}
+	</update>
+
+
+	<update id="getBatchQuartz">
+		update sign set antCoin = (antCoin - 1) ;
+	</update>
+	
+	<update id="updateUserVIPTime" parameterType="map">
+		update user
+		<set>
+			<if test="vipTime != null">
+				vipTime = #{vipTime,jdbcType=DATE},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER} 
+		
+	</update>
+
+</mapper>

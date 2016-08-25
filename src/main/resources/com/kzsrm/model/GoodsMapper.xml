@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.GoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Goods" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="attentionNum" property="attentionnum" jdbcType="INTEGER" />
+    <result column="payNum" property="paynum" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="image" property="image" jdbcType="VARCHAR" />
+    <result column="org" property="org" jdbcType="VARCHAR" />
+    <result column="suitTo" property="suitto" jdbcType="VARCHAR" />
+    <result column="leanStage" property="leanstage" jdbcType="VARCHAR" />
+    <result column="videoNum" property="videonum" jdbcType="INTEGER" />
+    <result column="totalTime" property="totaltime" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    t.id, t.name, t.price, t.detail, t.attentionNum, t.payNum, t.status, t.type, t.url, t.image, t.org, t.suitTo, 
+    t.leanStage, t.videoNum, t.totalTime, t.createTime
+  </sql>
+  <!-- 获取商品列表 -->
+  <select id="getList" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from `goods` t
+    where t.type = #{type,jdbcType=VARCHAR}
+    order by t.createTime desc
+    limit #{pageIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from `goods` t
+  </select>
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from `goods` t
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from `goods`
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kzsrm.model.Goods" >
+    insert into goods (id, name, price, 
+      detail, attentionNum, payNum, 
+      status, type, url, 
+      image, org, suitTo, 
+      leanStage, videoNum, totalTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
+      #{detail,jdbcType=VARCHAR}, #{attentionnum,jdbcType=INTEGER}, #{paynum,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
+      #{image,jdbcType=VARCHAR}, #{org,jdbcType=VARCHAR}, #{suitto,jdbcType=VARCHAR}, 
+      #{leanstage,jdbcType=VARCHAR}, #{videonum,jdbcType=INTEGER}, #{totaltime,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.kzsrm.model.Goods" >
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="detail != null" >
+        detail,
+      </if>
+      <if test="attentionnum != null" >
+        attentionNum,
+      </if>
+      <if test="paynum != null" >
+        payNum,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="image != null" >
+        image,
+      </if>
+      <if test="org != null" >
+        org,
+      </if>
+      <if test="suitto != null" >
+        suitTo,
+      </if>
+      <if test="leanstage != null" >
+        leanStage,
+      </if>
+      <if test="videonum != null" >
+        videoNum,
+      </if>
+      <if test="totaltime != null" >
+        totalTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="detail != null" >
+        #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="attentionnum != null" >
+        #{attentionnum,jdbcType=INTEGER},
+      </if>
+      <if test="paynum != null" >
+        #{paynum,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="image != null" >
+        #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="org != null" >
+        #{org,jdbcType=VARCHAR},
+      </if>
+      <if test="suitto != null" >
+        #{suitto,jdbcType=VARCHAR},
+      </if>
+      <if test="leanstage != null" >
+        #{leanstage,jdbcType=VARCHAR},
+      </if>
+      <if test="videonum != null" >
+        #{videonum,jdbcType=INTEGER},
+      </if>
+      <if test="totaltime != null" >
+        #{totaltime,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.Goods" >
+    update goods
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="detail != null" >
+        detail = #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="attentionnum != null" >
+        attentionNum = #{attentionnum,jdbcType=INTEGER},
+      </if>
+      <if test="paynum != null" >
+        payNum = #{paynum,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="image != null" >
+        image = #{image,jdbcType=VARCHAR},
+      </if>
+      <if test="org != null" >
+        org = #{org,jdbcType=VARCHAR},
+      </if>
+      <if test="suitto != null" >
+        suitTo = #{suitto,jdbcType=VARCHAR},
+      </if>
+      <if test="leanstage != null" >
+        leanStage = #{leanstage,jdbcType=VARCHAR},
+      </if>
+      <if test="videonum != null" >
+        videoNum = #{videonum,jdbcType=INTEGER},
+      </if>
+      <if test="totaltime != null" >
+        totalTime = #{totaltime,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.Goods" >
+    update goods
+    set name = #{name,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      detail = #{detail,jdbcType=VARCHAR},
+      attentionNum = #{attentionnum,jdbcType=INTEGER},
+      payNum = #{paynum,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      type = #{type,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      image = #{image,jdbcType=VARCHAR},
+      org = #{org,jdbcType=VARCHAR},
+      suitTo = #{suitto,jdbcType=VARCHAR},
+      leanStage = #{leanstage,jdbcType=VARCHAR},
+      videoNum = #{videonum,jdbcType=INTEGER},
+      totalTime = #{totaltime,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
