@@ -12,4 +12,18 @@ public interface UserGroupService extends BaseServiceMybatis<UserGroup, String> 
 	 * @param timeSpan
 	 */
 	void insertData(UserGroup usergroup);
+	
+	/**
+	 * 是否已加入群
+	 * 
+	 * @return
+	 */
+	UserGroup getByParams(String userId,String groupId);
+	
+	/**
+	 * 退出群
+	 * 
+	 * @return
+	 */
+	void delete(String groupId);
 }

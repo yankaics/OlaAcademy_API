@@ -227,6 +227,7 @@ public class UserController extends SimpleFormController {
 			jsonObj.put("age", user.getAge());
 			jsonObj.put("sex", user.getSex());
 			jsonObj.put("sign", user.getSign());
+			jsonObj.put("isActive", user.getIsActive());
 			jsonObj.put("vipTime", DateUtil.getDifferSec(new Date(), user.getVipTime())>0?DateUtil.getDifferSec(new Date(), user.getVipTime()):0);
 			result.put("data", jsonObj);
 		} catch (Exception e) {

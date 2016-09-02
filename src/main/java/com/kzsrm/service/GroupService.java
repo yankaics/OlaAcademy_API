@@ -20,10 +20,11 @@ public interface GroupService extends BaseServiceMybatis<Group, String> {
 	List<Group> getTeacherGroupList(String userId);
 	
 	/**
-	 * 用户(学生)所加入群列表
+	 * 用户(学生)群列表
+	 * @param type 1数学 2英语 3 逻辑 4写作
 	 * 
 	 * @return
 	 */
-	List<Group> getUserGroupList(String userId);
-
+	List<Group> getUserGroupList(String type);
+	
 }

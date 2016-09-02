@@ -48,15 +48,15 @@ public class GroupServiceImpl extends BaseServiceMybatisImpl<Group, String>
 	}
 
 	/**
-	 * 学生所加入群列表
+	 * 学生群列表
 	 * 
 	 * @return
 	 */
 	@Override
-	public List<Group> getUserGroupList(String userId) {
+	public List<Group> getUserGroupList(String type) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("userId", userId);
+		map.put("type", type);
 		return groupDao.getUserGroupList(map);
 	}
-
+	
 }

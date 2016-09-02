@@ -30,7 +30,7 @@
 		and cs.cid = #{cid,jdbcType=INTEGER}
   </select>
   <!-- 知识点中试题的数量 -->
-  <select id="getSubNumByPoint" resultType="java.lang.Integer" parameterType="java.lang.String" >
+  <select id="getSubNumByPoint" resultType="java.lang.Integer" parameterType="map" >
     select count(*)
     FROM
 	`subject` t, course_subject s

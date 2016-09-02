@@ -14,10 +14,15 @@ public class HomeworkDao<E> extends BaseMybatisDao<Homework, String> {
 	public String getMybatisMapperNamesapce() {
 		return "com.kzsrm.model.HomeworkMapper";
 	}
-
-	public List<Homework> getHomeworkList(Map<String, Object> map) {
+	
+	public List<Homework> getTeacherHomeworkList(Map<String, Object> map) {
 		return this.getSqlSession().selectList(
-				this.getMybatisMapperNamesapce() + ".getHomeworkList", map);
+				this.getMybatisMapperNamesapce() + ".getTeacherHomeworkList", map);
+	}
+
+	public List<Homework> getStudentHomeworkList(Map<String, Object> map) {
+		return this.getSqlSession().selectList(
+				this.getMybatisMapperNamesapce() + ".getStudentHomeworkList", map);
 	}
 
 }

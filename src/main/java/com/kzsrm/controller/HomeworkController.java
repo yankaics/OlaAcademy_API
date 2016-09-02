@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kzsrm.model.Group;
 import com.kzsrm.model.Homework;
 import com.kzsrm.model.Subject;
+import com.kzsrm.model.UserGroup;
 import com.kzsrm.service.GroupService;
 import com.kzsrm.service.HomeworkService;
 import com.kzsrm.service.SubjectService;
+import com.kzsrm.service.UserGroupService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ApiCode;
 import com.kzsrm.utils.ComUtils;
@@ -43,6 +45,8 @@ public class HomeworkController {
 	private UserService userService;
 	@Resource
 	private GroupService groupService;
+	@Resource
+	private UserGroupService ugService;
 	@Resource
 	private HomeworkService homeworkService;
 	@Resource
@@ -106,10 +110,11 @@ public class HomeworkController {
 	@ResponseBody
 	@RequestMapping(value = "/getUserGroupList")
 	public Map<String, Object> getUserGroupList(
-			@RequestParam(required = true) String userId) {
+			@RequestParam(required = true) String userId,
+			@RequestParam(required = true) String type) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			List<Group> groupList = groupService.getUserGroupList(userId);
+			List<Group> groupList = groupService.getUserGroupList(type);
 			JSONArray groupArray = new JSONArray();
 			for (Group group : groupList) {
 				JSONObject jsonObj = JSONObject.fromObject(group,
@@ -117,6 +122,7 @@ public class HomeworkController {
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm");
 				jsonObj.put("time", sdf.format(group.getCreateTime()));
+				jsonObj.put("isMember", ugService.getByParams(userId, group.getId()+"")!=null?1:0);
 				groupArray.add(jsonObj);
 			}
 			ret.put("result", groupArray);
@@ -126,9 +132,49 @@ public class HomeworkController {
 			return MapResult.failMap();
 		}
 	}
+	
+	/**
+	 * 加入／推出 群
+	 * @param 1 加入 2 推出
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/attendGroup")
+	public Map<String, Object> attendGroup(
+			@RequestParam(required = true) String userId,
+			@RequestParam(required = true) String groupId,
+			@RequestParam(required = true) String type) {
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			UserGroup ug = ugService.getByParams(userId, groupId);
+			if("1".equals(type)){
+				if(ug!=null){
+					return ret;
+				}else{
+					UserGroup usergroup = new UserGroup();
+					usergroup.setGroupId(Integer.parseInt(groupId));
+					usergroup.setUserId(Integer.parseInt(userId));
+					usergroup.setCreateTime(new Date());
+					ugService.insertData(usergroup);
+				}
+			}else{
+				if(ug!=null){
+					ugService.delete(ug.getId()+"");
+				}
+				
+			}
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	
 
 	/**
 	 * 用户作业列表
+	 * @param type 1 学生 2 老师
 	 * 
 	 * @return
 	 */
@@ -136,11 +182,12 @@ public class HomeworkController {
 	@RequestMapping(value = "/getHomeworkList")
 	public Map<String, Object> getHomeworkList(
 			@RequestParam(required = true) String userId,
+			@RequestParam(defaultValue = "1") int type,
 			@RequestParam(required = false) String homeworkId,
 			@RequestParam(defaultValue = "20") int pageSize) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			List<Homework> workList = homeworkService.getHomeworkList(userId, homeworkId, pageSize);
+			List<Homework> workList = homeworkService.getHomeworkList(userId, homeworkId, pageSize, type);
 			JSONArray homeworkList = new JSONArray();
 			for (Homework homework : workList) {
 				int count = subjectService.getSubNumByHomework(homework.getId()+"");

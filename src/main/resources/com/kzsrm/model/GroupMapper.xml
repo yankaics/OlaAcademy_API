@@ -6,18 +6,19 @@
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="avatar" property="avatar" jdbcType="VARCHAR" />
     <result column="createUser" property="createUser" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, avatar, createUser, createTime
+    id, name, avatar, createUser, type, createTime
   </sql>
   
   <select id="getUserGroupList" resultMap="BaseResultMap" parameterType="map" >
     select
-	g.id, g.name, g.avatar, g.createUser, g.createTime
-	from studygroup g, user_group ug 
-	where g.id = ug.groupId 
-	and ug.userId = #{userId,jdbcType=INTEGER}
+	<include refid="Base_Column_List" /> 
+	from studygroup  
+	where createUser > 0
+	and type = #{type,jdbcType=INTEGER}
 	order by createTime desc
   </select>
   

@@ -1,5 +1,8 @@
 package com.kzsrm.serviceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -33,5 +36,28 @@ public class UserGroupServiceImpl extends
 	@Override
 	public void insertData(UserGroup usergroup) {
 		usergroupDao.save(usergroup);
+	}
+	
+	/**
+	 * 是否已加入群
+	 * 
+	 * @return
+	 */
+	@Override
+	public UserGroup getByParams(String userId,String groupId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userId", userId);
+		map.put("groupId", groupId);
+		return usergroupDao.getNumByUserAndGroup(map);
+	}
+	
+	/**
+	 * 退出群
+	 * 
+	 * @return
+	 */
+	@Override
+	public void delete(String groupId) {
+		usergroupDao.deleteById(groupId);
 	}
 }

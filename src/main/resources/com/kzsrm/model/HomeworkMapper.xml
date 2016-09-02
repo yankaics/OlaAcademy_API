@@ -10,8 +10,8 @@
   <sql id="Base_Column_List" >
     id, name, groupId, createTime
   </sql>
-  
-  <select id="getHomeworkList" resultMap="BaseResultMap" parameterType="map" >
+  <!-- 利用视图查询学生作业 -->
+  <select id="getStudentHomeworkList" resultMap="BaseResultMap" parameterType="map" >
     select
 	id, name, userId, userName, avatar, groupId, groupName, createTime
 	from user_homework 
@@ -20,6 +20,18 @@
 	and createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
 	</if>
 	order by createTime desc limit #{pageCount,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getTeacherHomeworkList" resultMap="BaseResultMap" parameterType="map" >
+    select
+	h.id, h.name, g.createUser as userId, g.id as groupId, g.name as groupName, h.createTime
+	from homework h, studygroup g
+	where createUser = #{userId,jdbcType=INTEGER} 
+	and h.groupId = g.id
+	<if test="createTime != null">
+	and h.createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
+	</if>
+	order by h.createTime desc limit #{pageCount,jdbcType=INTEGER}
   </select>
   
   <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >

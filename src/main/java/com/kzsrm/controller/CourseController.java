@@ -78,7 +78,7 @@ public class CourseController {
 			Course course = courseService.getById(pid);
 			JSONObject _course = courseService.getMultilevelCour(course, userid, type);
 			if(!TextUtils.isEmpty(userid)&&"1".equals(type)){
-				List<Homework> homeworkList = homeworkService.getHomeworkList(userid, "", 1);
+				List<Homework> homeworkList = homeworkService.getHomeworkList(userid, "", 1, 1);
 				if(homeworkList.size()>0){
 					JSONObject jsonObj = JSONObject.fromObject(homeworkList.get(0),
 							homeworkJC);

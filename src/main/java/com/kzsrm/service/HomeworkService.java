@@ -12,7 +12,7 @@ public interface HomeworkService extends BaseServiceMybatis<Homework, String> {
 	 * 
 	 * @return
 	 */
-	List<Homework> getHomeworkList(String userId,String homeworkId, int pageCount);
+	List<Homework> getHomeworkList(String userId,String homeworkId, int pageCount,int type);
 	
 	/**
 	 * 已答题数量

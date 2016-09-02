@@ -37,7 +37,7 @@ public class HomeworkServiceImpl extends
 	 * @return
 	 */
 	@Override
-	public List<Homework> getHomeworkList(String userId, String homeworkId, int pageCount) {
+	public List<Homework> getHomeworkList(String userId, String homeworkId, int pageCount,int type) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (!StringUtils.isEmpty(homeworkId)) {
 			Homework homework = homeworkDao.getById(homeworkId);
@@ -47,7 +47,11 @@ public class HomeworkServiceImpl extends
 		}
 		map.put("userId", userId);
 		map.put("pageCount", pageCount);
-		return homeworkDao.getHomeworkList(map);
+		if(type==2){
+			return homeworkDao.getTeacherHomeworkList(map);
+		}else{
+			return homeworkDao.getStudentHomeworkList(map);
+		}
 	}
 	
 	/**

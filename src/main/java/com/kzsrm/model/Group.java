@@ -8,6 +8,7 @@ public class Group {
 	private String name;
 	private String avatar;
 	private int createUser;
+	private int type;
 	private Date createTime;
 	
 	public int getId() {
@@ -33,6 +34,12 @@ public class Group {
 	}
 	public void setCreateUser(int createUser) {
 		this.createUser = createUser;
+	}
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
 	}
 	public Date getCreateTime() {
 		return createTime;
