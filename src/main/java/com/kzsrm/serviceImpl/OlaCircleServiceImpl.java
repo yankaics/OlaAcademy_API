@@ -75,4 +75,14 @@ public class OlaCircleServiceImpl extends BaseServiceMybatisImpl<OlaCircle, Stri
 		circleDao.update(circle);
 	}
 	
+	/**
+	 * 浏览量
+	 */
+	@Override
+	public void updateReadNumber(OlaCircle circle) {
+		int readNumber = circle.getReadNumber()+1;
+		circle.setReadNumber(readNumber);
+		circleDao.update(circle);
+	}
+	
 }

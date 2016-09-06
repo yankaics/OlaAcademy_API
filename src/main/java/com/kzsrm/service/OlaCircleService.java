@@ -24,6 +24,11 @@ public interface OlaCircleService  extends BaseServiceMybatis<OlaCircle, String>
 	 * 对帖子点赞
 	 */
 	void praiseCirclePost(OlaCircle circle);
+	
+	/**
+	 * 浏览量
+	 */
+	void updateReadNumber(OlaCircle circle);
 
 }
 

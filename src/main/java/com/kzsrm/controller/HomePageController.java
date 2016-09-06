@@ -58,7 +58,7 @@ public class HomePageController {
 				question.put("id", circle.getId());
 				question.put("title", circle.getTitle());
 				question.put("content", circle.getContent());
-				question.put("number", circle.getPraiseNumber());
+				question.put("number", circle.getReadNumber());
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm:ss");
 				question.put("time", sdf.format(circle.getCreateTime()));

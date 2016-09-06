@@ -1,6 +1,7 @@
 package com.kzsrm.serviceImpl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -44,7 +45,7 @@ public class UserGroupServiceImpl extends
 	 * @return
 	 */
 	@Override
-	public UserGroup getByParams(String userId,String groupId) {
+	public List<UserGroup> getByParams(String userId,String groupId) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("userId", userId);
 		map.put("groupId", groupId);

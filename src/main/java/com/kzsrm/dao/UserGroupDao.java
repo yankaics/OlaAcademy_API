@@ -1,5 +1,6 @@
 package com.kzsrm.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,8 @@ public class UserGroupDao<E> extends BaseMybatisDao<UserGroup, String> {
 		return "com.kzsrm.model.UserGroupMapper";
 	}
 	
-	public UserGroup getNumByUserAndGroup(Map<String, Object> map) {
-		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getByParam", map);
+	public List<UserGroup> getNumByUserAndGroup(Map<String, Object> map) {
+		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getByParam", map);
 	}
 
 }

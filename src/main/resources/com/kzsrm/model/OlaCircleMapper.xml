@@ -115,6 +115,9 @@
       <if test="praiseNumber != null" >
         praiseNumber = #{praiseNumber,jdbcType=INTEGER},
       </if>
+      <if test="readNumber != null" >
+        readNumber = #{readNumber,jdbcType=INTEGER},
+      </if>
       <if test="createTime != null" >
         createTime = #{createTime,jdbcType=TIMESTAMP},
       </if>

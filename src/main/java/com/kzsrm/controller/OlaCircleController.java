@@ -153,6 +153,7 @@ public class OlaCircleController {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
 			OlaCircle circle = circleService.getById(circleId);
+			circleService.updateReadNumber(circle);  //更新浏览量
 			User postUser = userService.selectUser(circle.getUserId());
 			JSONObject jsonobj = JSONObject.fromObject(circle, circleJC);
 			jsonobj.put("userName", postUser.getName());
@@ -198,6 +199,26 @@ public class OlaCircleController {
 		try {
 			OlaCircle circle = circleService.getById(circleId);
 			circleService.praiseCirclePost(circle);
+			return MapResult.initMap();
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 浏览量
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/updateReadNumber")
+	public Map<String, Object> updateReadNumber(
+			@RequestParam(required = false) String circleId){
+		try {
+			OlaCircle circle = circleService.getById(circleId);
+			circleService.updateReadNumber(circle);
 			return MapResult.initMap();
 		} catch (Exception e) {
 			// TODO: handle exception

@@ -122,7 +122,8 @@ public class HomeworkController {
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm");
 				jsonObj.put("time", sdf.format(group.getCreateTime()));
-				jsonObj.put("isMember", ugService.getByParams(userId, group.getId()+"")!=null?1:0);
+				jsonObj.put("isMember", ugService.getByParams(userId, group.getId()+"").size()>0?1:0);
+				jsonObj.put("number", ugService.getByParams("", group.getId()+"").size());
 				groupArray.add(jsonObj);
 			}
 			ret.put("result", groupArray);
@@ -146,9 +147,9 @@ public class HomeworkController {
 			@RequestParam(required = true) String type) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			UserGroup ug = ugService.getByParams(userId, groupId);
+			List<UserGroup> ugList = ugService.getByParams(userId, groupId);
 			if("1".equals(type)){
-				if(ug!=null){
+				if(ugList.size()>0){
 					return ret;
 				}else{
 					UserGroup usergroup = new UserGroup();
@@ -158,8 +159,8 @@ public class HomeworkController {
 					ugService.insertData(usergroup);
 				}
 			}else{
-				if(ug!=null){
-					ugService.delete(ug.getId()+"");
+				if(ugList.size()>0){
+					ugService.delete(ugList.get(0).getId()+"");
 				}
 				
 			}

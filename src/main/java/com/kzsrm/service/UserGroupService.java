@@ -1,5 +1,7 @@
 package com.kzsrm.service;
 
+import java.util.List;
+
 import com.kzsrm.baseservice.BaseServiceMybatis;
 import com.kzsrm.model.UserGroup;
 
@@ -18,7 +20,7 @@ public interface UserGroupService extends BaseServiceMybatis<UserGroup, String> 
 	 * 
 	 * @return
 	 */
-	UserGroup getByParams(String userId,String groupId);
+	List<UserGroup> getByParams(String userId,String groupId);
 	
 	/**
 	 * 退出群

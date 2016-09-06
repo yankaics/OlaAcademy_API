@@ -70,6 +70,22 @@ public class PayController {
 		ret.put("result", 1);
 		return ret;
 	}
+	
+	/**
+	 * 是否显示支付模块(苹果审核)
+	 * 跟版本关联，1.2.2以后版本使用
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/showPayModuleWithVersion")
+	public Map<String, Object> showPayModuleWithVersion() throws Exception {
+		Map<String, Object> ret = MapResult.initMap();
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("version", "1.2.2");
+		jsonObj.put("thirdPay", "1");
+		ret.put("result", jsonObj);
+		return ret;
+	}
 
 	/**
 	 * 支付宝订单信息
