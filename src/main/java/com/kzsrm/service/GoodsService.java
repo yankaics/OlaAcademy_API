@@ -21,5 +21,12 @@ public interface GoodsService  extends BaseServiceMybatis<Goods, String> {
 	 * @return
 	 */
 	List<Goods> getBuyList(int userId,int status);
+	
+	/**
+	 * 更新购买数量
+	 * 
+	 * @return
+	 */
+	void updateGoods(String goodsId);
 
 }

@@ -54,15 +54,18 @@ public class HomeworkController {
 	
 	/**
 	 * 创建群
+	 * type 1 数学 2 英语 3 逻辑 4 写作
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/createGroup")
 	public Map<String, Object> createGroup(@RequestParam(required = true) String name,
-			@RequestParam(required = true) int userId,@RequestParam(required = false) String avatar) {
+			@RequestParam(required = true) int userId,@RequestParam(required = false) String avatar,
+			@RequestParam(required = true) int type) {
 		Group group = new Group();
 		group.setName(name);
 		group.setCreateUser(userId);
 		group.setAvatar(avatar);
+		group.setType(type);
 		group.setCreateTime(new Date());
 		try {
 			groupService.createGroup(group);
@@ -135,8 +138,8 @@ public class HomeworkController {
 	}
 	
 	/**
-	 * 加入／推出 群
-	 * @param 1 加入 2 推出
+	 * 加入／退出 群
+	 * @param 1 加入 2 退出
 	 * @return
 	 */
 	@ResponseBody
@@ -171,7 +174,26 @@ public class HomeworkController {
 		}
 	}
 	
-	
+	/**
+	 * 发布作业
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/deployHomework")
+	public Map<String, Object> deployHomework(
+			@RequestParam(required = true) String groupId,
+			@RequestParam(required = true) String name,
+			@RequestParam(required = true) String subjectIds){
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			homeworkService.createHomework(groupId, name, subjectIds);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
 
 	/**
 	 * 用户作业列表
@@ -187,6 +209,14 @@ public class HomeworkController {
 			@RequestParam(required = false) String homeworkId,
 			@RequestParam(defaultValue = "20") int pageSize) {
 		try {
+			// 如果是老师，先判断是否以创建过群
+			if(type==2){
+				List<Group> groupList = groupService.getTeacherGroupList(userId);
+				if(groupList.size()==0){
+					return MapResult.initMap(10001, "您尚未创建作业群");
+				}
+			}
+			// 获取老师或学生的作业列表
 			Map<String, Object> ret = MapResult.initMap();
 			List<Homework> workList = homeworkService.getHomeworkList(userId, homeworkId, pageSize, type);
 			JSONArray homeworkList = new JSONArray();

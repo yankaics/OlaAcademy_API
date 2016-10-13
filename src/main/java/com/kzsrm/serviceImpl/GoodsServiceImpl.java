@@ -70,4 +70,16 @@ public class GoodsServiceImpl extends BaseServiceMybatisImpl<Goods, String>
 		return goodsList;
 	}
 
+	/**
+	 * 更新购买数量
+	 * 
+	 * @return
+	 */
+	@Override
+	public void updateGoods(String goodsId){
+		Goods goods = goodsDao.getById(goodsId);
+		goods.setPaynum(goods.getPaynum()+1);
+		goodsDao.update(goods);
+	}
+
 }

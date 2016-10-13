@@ -70,10 +70,10 @@ public class PayController {
 		ret.put("result", 1);
 		return ret;
 	}
-	
+
 	/**
-	 * 是否显示支付模块(苹果审核)
-	 * 跟版本关联，1.2.2以后版本使用
+	 * 是否显示支付模块(苹果审核) 跟版本关联，1.2.2以后版本使用
+	 * 
 	 * @return
 	 */
 	@ResponseBody
@@ -81,8 +81,8 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.2.2");
-		jsonObj.put("thirdPay", "1");
+		jsonObj.put("version", "1.2.4");
+		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;
 	}
@@ -241,6 +241,11 @@ public class PayController {
 	 */
 	private int createOrder(String tradeNo, String userId, String type,
 			String goodsId) {
+		// 更新购买数量
+		if ("3".equals(type)) {
+			goodsService.updateGoods(goodsId);
+		}
+		// 创建订单
 		OrderInfo orderInfo = new OrderInfo();
 		orderInfo.setTradeNo(tradeNo);
 		orderInfo.setUserId(Integer.parseInt(userId));
@@ -355,9 +360,9 @@ public class PayController {
 	public Map<String, Object> updateVIPByIAP(
 			@RequestParam(required = true) int userId,
 			@RequestParam(required = true) String productId,
-			@RequestParam(required = true) String receipt) throws Exception{
+			@RequestParam(required = true) String receipt) throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
-		//if(checkStatus(receipt).equals("0")); // 从苹果服务器校验支付状态,后续完善
+		// if(checkStatus(receipt).equals("0")); // 从苹果服务器校验支付状态,后续完善
 		User user = userService.selectUser(userId);
 		Calendar c = Calendar.getInstance();
 		try {
@@ -366,16 +371,16 @@ public class PayController {
 					|| DateUtil.getDifferSec(new Date(), user.getVipTime()) < 0) {
 				Date date = new Date(); // 当前日期
 				c.setTime(date);
-				if(productId.equals("olaxueyuan1001")){
+				if (productId.equals("olaxueyuan1001")) {
 					c.add(Calendar.MONTH, 1);
-				}else{
+				} else {
 					c.add(Calendar.MONTH, 6);
 				}
 			} else {
 				c.setTimeInMillis(user.getVipTime().getTime()); // 会员有效日期
-				if(productId.equals("olaxueyuan1001")){
+				if (productId.equals("olaxueyuan1001")) {
 					c.add(Calendar.MONTH, 1);
-				}else{
+				} else {
 					c.add(Calendar.MONTH, 6);
 				}
 			}
@@ -392,8 +397,10 @@ public class PayController {
 	private String checkStatus(String receipt) {
 		HttpURLConnection conn = null;
 		try {
-			//String url = "https://buy.itunes.apple.com/verifyReceipt"; //正式服务器校验
-			String url = "https://sandbox.itunes.apple.com/verifyReceipt"; //sandbox 用于苹果审核时校验
+			// String url = "https://buy.itunes.apple.com/verifyReceipt";
+			// //正式服务器校验
+			String url = "https://sandbox.itunes.apple.com/verifyReceipt"; // sandbox
+																			// 用于苹果审核时校验
 			// 创建一个URL对象
 			URL mURL = new URL(url);
 			// 调用URL的openConnection()方法,获取HttpURLConnection对象
@@ -464,7 +471,7 @@ public class PayController {
 		}
 		return userService.updateVipTime(orderInfo.getUserId(), c.getTime());
 	}
-	
+
 	/**
 	 * 根据流返回一个字符串信息 *
 	 * 

@@ -42,9 +42,9 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kzsrm.model.Group" >
-    insert into studygroup (id, name,avatar,createUser,createTime)
+    insert into studygroup (id, name,avatar,createUser,type,createTime)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},
-     #{createUser,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+     #{createUser,jdbcType=INTEGER},  #{type,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.kzsrm.model.OlaCircle" >
     insert into olacircle

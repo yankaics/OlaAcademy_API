@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -80,7 +81,6 @@ public class GoodsController {
 	
 	/**
 	 * 商品订单购买状态
-	 * @param pageSize		页大小
 	 * @return
 	 */
 	@ResponseBody
@@ -98,7 +98,6 @@ public class GoodsController {
 	}
 	/**
 	 * 商品（视频集）下的视频列表
-	 * @param pageSize		页大小
 	 * @return
 	 */
 	@ResponseBody
@@ -108,6 +107,10 @@ public class GoodsController {
 		try{
 			Map<String, Object> ret = MapResult.initMap();
 			List<Video> videoList = videoService.getVideosByGoods(userId, gid);
+			// 购买状态
+			if(!TextUtils.isEmpty(userId)){
+				ret.put("orderStatus", orderService.getOrderStatus(userId, gid));
+			}
 			
 			ret.put("result", videoList);
 			return ret;

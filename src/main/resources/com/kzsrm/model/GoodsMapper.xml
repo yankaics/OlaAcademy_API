@@ -222,7 +222,8 @@
       suitTo = #{suitto,jdbcType=VARCHAR},
       leanStage = #{leanstage,jdbcType=VARCHAR},
       videoNum = #{videonum,jdbcType=INTEGER},
-      totalTime = #{totaltime,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+      totalTime = #{totaltime,jdbcType=INTEGER},
+      createTime = #{createTime,jdbcType=INTEGER}
+    where id = #{id,jdbcType=TIMESTAMP}
   </update>
 </mapper>

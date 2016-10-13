@@ -67,6 +67,7 @@
 				<value>classpath:/com/kzsrm/model/VideoMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/VideoLogMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/OlaCircleMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/AttentionShipMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/CommentMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/KeywordMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/OrganizationMapper.xml</value>
@@ -85,7 +86,9 @@
 				<value>classpath:/com/kzsrm/model/GroupMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/UserGroupMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/HomeworkMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/HomeworkSubjectMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/BannerMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/DailyActMapper.xml</value>
 			</list>
 		</property>
 	</bean>

@@ -13,17 +13,21 @@
     <result column="tname" property="tname" jdbcType="VARCHAR" />
     <result column="pic" property="pic" jdbcType="VARCHAR" />
     <result column="isfree" property="isfree" jdbcType="INTEGER" />
+    <result column="attachmentId" property="attachmentId" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="size" property="size" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    t.id, t.name, t.content, t.address, t.playcount, t.timespan, t.orgname, t.tname, t.pic, t.isfree
+    t.id, t.name, t.content, t.address, t.playcount, t.timespan, t.orgname, t.tname, t.pic, t.isfree, t.attachmentId
   </sql>
   <!-- 获取视频集下的视频 -->
   <select id="getVideosByGoods" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    <include refid="Base_Column_List" />
-    from video t, goods_video gv
+    select cv.*, a.url, a.size from (select 
+    <include refid="Base_Column_List" /> 
+    from video t, goods_video gv 
     where t.id = gv.vid
-    	and gv.gid = #{gid,jdbcType=VARCHAR}
+    and gv.gid = #{gid,jdbcType=VARCHAR}) cv 
+    left join attachment a on cv.attachmentId = a.id
   </select>
   
   <select id="getVideoBySubject" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -41,12 +45,15 @@
     where t.id = pv.vid and pv.cid = p.id
     and p.id = #{pointId,jdbcType=VARCHAR}
   </select>
+  
   <select id="getVideoListByPoint" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select cv.*, a.url, a.size from (select 
     <include refid="Base_Column_List" /> ,pv.weight
     from video t, course_video pv, course p
     where t.id = pv.vid and pv.cid = p.id
-    and p.id = #{pointId,jdbcType=VARCHAR}
+    and p.id = #{pointId,jdbcType=VARCHAR}) cv 
+    left join attachment a on cv.attachmentId = a.id
+    
   </select>
   
   <select id="getVideoByTag" resultMap="BaseResultMap" parameterType="java.lang.String" >

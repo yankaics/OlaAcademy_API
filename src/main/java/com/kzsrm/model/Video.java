@@ -23,6 +23,12 @@ public class Video {
     
     private int isfree;
     
+    private int attachmentId;
+    
+    private String url;
+    
+    private String size;
+    
     public Integer getId() {
         return id;
     }
@@ -109,6 +115,30 @@ public class Video {
 
 	public void setIsfree(int isfree) {
 		this.isfree = isfree;
+	}
+
+	public int getAttachmentId() {
+		return attachmentId;
+	}
+
+	public void setAttachmentId(int attachmentId) {
+		this.attachmentId = attachmentId;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
 	}
 
 }

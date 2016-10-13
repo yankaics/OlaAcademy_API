@@ -6,6 +6,13 @@ import com.kzsrm.baseservice.BaseServiceMybatis;
 import com.kzsrm.model.Homework;
 
 public interface HomeworkService extends BaseServiceMybatis<Homework, String> {
+	
+	/**
+	 * 发布作业
+	 * 
+	 * @return
+	 */
+	void createHomework(String groupId, String name, String subjectIds);
 
 	/**
 	 * 作业列表

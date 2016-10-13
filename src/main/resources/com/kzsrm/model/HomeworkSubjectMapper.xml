@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.HomeworkSubjectMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.HomeworkSubject" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="homeworkId" property="homeworkId" jdbcType="INTEGER" />
+    <result column="subjectId" property="subjectId" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, homeworkId, subjectId, createTime
+  </sql>
+  
+  <!-- 按条件查询 -->
+  <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from homework_subject
+    <where>
+    	<if test="homeworkId != null and homeworkId != ''">
+    		homeworkId = #{homeworkId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="subjectId != null and subjectId != ''">
+    		and subjectId = #{subjectId,jdbcType=VARCHAR}
+    	</if>
+    </where>
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from homework_subject
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.String" >
+    delete from homework_subject
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="com.kzsrm.model.HomeworkSubject" >
+    insert into homework_subject (id, homeworkId, subjectId, createTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{homeworkId,jdbcType=INTEGER},
+     #{subjectId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  
+</mapper>

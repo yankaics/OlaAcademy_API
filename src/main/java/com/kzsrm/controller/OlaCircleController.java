@@ -104,6 +104,7 @@ public class OlaCircleController {
 				if(user!=null){
 					JSONObject jsonObj = new JSONObject();
 					jsonObj.put("circleId", circle.getId());
+					jsonObj.put("userId", user.getId());
 					jsonObj.put("userName", TextUtils.isEmpty(user.getName())?"小欧":user.getName());
 					jsonObj.put("userAvatar", user.getAvator());
 					jsonObj.put("type", circle.getType());
