@@ -75,7 +75,6 @@
 				<value>classpath:/com/kzsrm/model/TeacherMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/CheckInMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/yzm.xml</value>
-				<value>classpath:/com/kzsrm/model/SignMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/ExaminationMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/GoodsMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/OptionMapper.xml</value>
@@ -88,7 +87,8 @@
 				<value>classpath:/com/kzsrm/model/HomeworkMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/HomeworkSubjectMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/BannerMapper.xml</value>
-				<value>classpath:/com/kzsrm/model/DailyActMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/CoinHistoryMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/ExchangeMapper.xml</value>
 			</list>
 		</property>
 	</bean>

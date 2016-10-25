@@ -88,7 +88,7 @@ public class HomeworkServiceImpl extends
 	}
 	
 	/**
-	 * 已答题数量
+	 * 单个用户已答题数量
 	 * 
 	 * @return
 	 */
@@ -98,6 +98,32 @@ public class HomeworkServiceImpl extends
 		map.put("homeworkId", homeworkId);
 		map.put("userId", userId);
 		return subjectWorkLogDao.getWorkHasDoneSubNum(map);
+	}
+	
+	/**
+	 * 所有群成员已答题数量
+	 * 
+	 * @return
+	 */
+	@Override
+	public Map<String, Long> getHasDoneSubNumByGroup(String homeworkId, String groupId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("homeworkId", homeworkId);
+		map.put("groupId", groupId);
+		return subjectWorkLogDao.getWorkHasDoneSubNumByGroup(map);
+	}
+	
+	/**
+	 * 所有群成员已答题正确数量
+	 * 
+	 * @return
+	 */
+	@Override
+	public Integer getRightSubNumByGroup(String homeworkId, String groupId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("homeworkId", homeworkId);
+		map.put("groupId", groupId);
+		return subjectWorkLogDao.getWorkRightSubNumByGroup(map);
 	}
 
 }

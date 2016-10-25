@@ -1,30 +1,31 @@
 package com.kzsrm.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.kzsrm.model.DailyAct;
+import com.kzsrm.model.CoinHistory;
 import com.kzsrm.mybatis.BaseMybatisDao;
 
 @Repository
-public class DailyActDao<E> extends BaseMybatisDao<DailyAct, String> {
+public class CoinHistoryDao<E> extends BaseMybatisDao<CoinHistory, String> {
 
 	public String getMybatisMapperNamesapce() {
-		return "com.kzsrm.model.DailyActMapper";
+		return "com.kzsrm.model.CoinHistoryMapper";
 	}
 
-	public DailyAct getActByPramas(Map<String, Object> map) {
-		return this.getSqlSession().selectOne(
+	public List<CoinHistory> getActByPramas(Map<String, Object> map) {
+		return this.getSqlSession().selectList(
 				this.getMybatisMapperNamesapce() + ".getByParam", map);
 	}
 	
-	public DailyAct getLastestByUser(int userId) {
+	public CoinHistory getLastestByUser(int userId) {
 		return this.getSqlSession().selectOne(
 				this.getMybatisMapperNamesapce() + ".getLastestByUser", userId);
 	}
 	
-	public void signIn(DailyAct dailyAct) {
+	public void insertData(CoinHistory dailyAct) {
 		this.getSqlSession().selectOne(
 				this.getMybatisMapperNamesapce() + ".insertSelective", dailyAct);
 	}

@@ -1,7 +1,8 @@
 package com.kzsrm.serviceImpl;
 
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kzsrm.baseservice.BaseServiceMybatisImpl;
 import com.kzsrm.dao.UserDao;
 import com.kzsrm.dao.UserGroupDao;
-import com.kzsrm.model.Sign;
 import com.kzsrm.model.User;
 import com.kzsrm.model.UserGroup;
 import com.kzsrm.model.Yzm;
@@ -52,9 +52,8 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 	public Map<String, Object> insertUser(User user) {
 		int i = this.userDao.saveEntity(user);
 		if(i==1){  //添加默认群
-			User u = this.userDao.selectIsExitUser(user.getPhone());
 			UserGroup userGroup = new UserGroup();
-			userGroup.setUserId(u.getId());
+			userGroup.setUserId(user.getId());
 			userGroup.setGroupId(1);
 			userGroup.setCreateTime(new Date());
 			usergroupDao.save(userGroup);
@@ -111,34 +110,6 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 		return map;
 	}
 
-	/*
-	 * 添加打卡记录
-	 */
-	public boolean insertSign(Sign sign) {
-		boolean flag = false;
-		int result = this.userDao.insertSign(sign);
-		if (result == 1) {
-			flag = true;
-		} else {
-			flag = false;
-		}
-		return flag;
-	}
-
-	/*
-	 * 获取该用户是否打过卡
-	 */
-	public Sign getSign(String phone) {
-		Sign sign = this.userDao.getSign(phone);
-		return sign;
-	}
-
-	@Override
-	public int updateSign(Sign sign) {
-		int result = this.userDao.updateSign(sign);
-		return result;
-	}
-
 	@Override
 	public User selByEmailOrMobile(String mobile) {
 		return this.userDao.getUserByEmailOrMobile(mobile);
@@ -146,7 +117,7 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 
 	@Override
 	public int batchQuartz() {
-		return this.userDao.getBatchQuartz();
+		return 1;  // 暂未执行定时任务
 	}
 	
 	/*
@@ -155,5 +126,21 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 	@Override
 	public int updateVipTime(int userId, Date vipTime) {
 		return  this.userDao.updateVIPTime(userId, vipTime);
+	}
+	
+	/**
+	 * 群成员列表
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<User> getGroupMember(String groupId,int pageIndex, int pageSize) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("groupId", groupId);
+		if(pageIndex!=0){
+			params.put("pageIndex", (pageIndex - 1) * pageSize);
+			params.put("pageSize", pageSize);
+		}
+		return userDao.getListByGroup(params);
 	}
 }

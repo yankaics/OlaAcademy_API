@@ -58,5 +58,5 @@ public class GroupServiceImpl extends BaseServiceMybatisImpl<Group, String>
 		map.put("type", type);
 		return groupDao.getUserGroupList(map);
 	}
-	
+
 }

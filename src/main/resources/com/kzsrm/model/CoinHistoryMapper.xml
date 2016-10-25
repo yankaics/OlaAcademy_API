@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.CoinHistoryMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.CoinHistory" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="userId" property="userId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="dealNum" property="dealNum" jdbcType="INTEGER" />
+    <result column="date" property="date" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name,userId, type,dealNum,date
+  </sql>
+  
+  <!-- 按条件查询 -->
+  <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from coinhistory
+    <where>
+    	<if test="userId != null and userId != ''">
+    		userId = #{userId,jdbcType=INTEGER}
+    	</if>
+    	<if test="type != null and type != ''">
+    		and type = #{type,jdbcType=INTEGER}
+    	</if>
+    	<if test="date != null and date != ''">
+    		and date = #{date,jdbcType=VARCHAR}
+    	</if>
+    </where>
+    order by date desc
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from coinhistory
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 最近一次签到 -->
+  <select id="getLastestByUser" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from coinhistory
+    where userId = #{userId,jdbcType=INTEGER} 
+    and type = 1
+    order by date desc limit 1
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.String" >
+    delete from coinhistory
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.kzsrm.model.CoinHistory" >
+    insert into coinhistory
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="dealNum != null" >
+        dealNum,
+      </if>
+      <if test="date != null" >
+        date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="dealNum != null" >
+        #{dealNum,jdbcType=INTEGER},
+      </if>
+      <if test="date != null" >
+        #{date,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

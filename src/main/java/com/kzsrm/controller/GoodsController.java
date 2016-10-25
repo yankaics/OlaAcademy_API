@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JsonConfig;
+
 import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,16 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kzsrm.model.Collection;
 import com.kzsrm.model.Goods;
 import com.kzsrm.model.Video;
+import com.kzsrm.service.CollectionService;
 import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.OrderInfoService;
 import com.kzsrm.service.VideoService;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
 
 @Controller
 @RequestMapping("/goods")
@@ -33,6 +35,7 @@ public class GoodsController {
 	@Resource private GoodsService goodsService;
 	@Resource private VideoService videoService;
 	@Resource private OrderInfoService orderService;
+	@Resource private CollectionService collectionService;
 
 	/**
 	 * 商品列表
@@ -111,7 +114,14 @@ public class GoodsController {
 			if(!TextUtils.isEmpty(userId)){
 				ret.put("orderStatus", orderService.getOrderStatus(userId, gid));
 			}
-			
+			if(!TextUtils.isEmpty(userId)){
+				String isCollect = "0";
+				Collection c = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(gid),2);
+				if(c!=null){
+					isCollect = "1";
+				}
+				ret.put("isCollect", isCollect);
+			}
 			ret.put("result", videoList);
 			return ret;
 		} catch (Exception e) {

@@ -27,8 +27,6 @@ public class User {
 	private String avator;
 	private String sign;
 	private String level;
-	// private int regnum;
-	// private Date lastreg;
 	private String honor;
 	private String learntime;
 	private String status;
@@ -36,15 +34,8 @@ public class User {
 	private String yzm;
 	private int isActive;
 	private String realName;
-	private String infoPerfectLev;
+	private String coin;
 	private Date vipTime;
-	public String getInfoPerfectLev() {
-		return infoPerfectLev;
-	}
-
-	public void setInfoPerfectLev(String infoPerfectLev) {
-		this.infoPerfectLev = infoPerfectLev;
-	}
 
 	public String getRealName() {
 		return realName;
@@ -222,6 +213,14 @@ public class User {
 		this.status = status;
 	}
 
+	public String getCoin() {
+		return coin;
+	}
+
+	public void setCoin(String coin) {
+		this.coin = coin;
+	}
+
 	public Date getVipTime() {
 		return vipTime;
 	}
@@ -236,6 +235,6 @@ public class User {
 				+ passwd + ", email=" + email + ", birthday=" + birthday + ", qq=" + qq + ", sign=" + sign
 				+ ", regtime=" + regtime + ", logintime=" + logintime + ", status=" + status + ", avator=" + avator
 				+ ", level=" + level + ", yzm=" + yzm + ", honor=" + honor + ", learntime=" + learntime + ", examtype="
-				+ examtype + ", isActive="+isActive+",realName="+realName+",infoPerfectLev="+infoPerfectLev+"]";
+				+ examtype + ", isActive="+isActive+",realName="+realName+",coin="+coin+"]";
 	}
 }

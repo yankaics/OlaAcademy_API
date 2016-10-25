@@ -22,6 +22,7 @@ import com.kzsrm.model.Examination;
 import com.kzsrm.model.Subject;
 import com.kzsrm.model.User;
 import com.kzsrm.service.ExamService;
+import com.kzsrm.service.ExchangeService;
 import com.kzsrm.service.SubjectService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ApiCode;
@@ -42,6 +43,8 @@ public class ExamController {
 	private SubjectService subjectService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private ExchangeService exchangeService;
 
 	/**
 	 * 模考列表
@@ -73,9 +76,10 @@ public class ExamController {
 				if (!StringUtils.isEmpty(userId)) {
 					User user = userService.selectUser(Integer.parseInt(userId));
 					if (exam.getIsfree() == 0) {
-						if (user.getVipTime() != null
+						// 会员或者用欧拉币兑换
+						if ((user.getVipTime() != null
 								&& DateUtil.getDifferSec(user.getVipTime(),
-										new Date()) < 0) {
+										new Date()) < 0)||exchangeService.getByParams(userId, exam.getId()+"", "2").size()==1) {
 							jsonObj.put("isfree", 1);
 						} else {
 							jsonObj.put("isfree", 0);

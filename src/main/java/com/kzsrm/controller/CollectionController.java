@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kzsrm.model.Collection;
 import com.kzsrm.model.Course;
+import com.kzsrm.model.Goods;
 import com.kzsrm.model.Video;
 import com.kzsrm.service.CollectionService;
 import com.kzsrm.service.CourseService;
+import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.VideoService;
 import com.kzsrm.utils.ApiCode;
 import com.kzsrm.utils.MapResult;
@@ -34,6 +36,7 @@ public class CollectionController {
 	@Resource private VideoService videoService;
 	@Resource private CollectionService collectionService;
 	@Resource private CourseService courseService;
+	@Resource private GoodsService goodsService;
 	
 	/**
 	 * 收藏
@@ -44,6 +47,8 @@ public class CollectionController {
 	 *             视频 ID
 	 * @param courseId
 	 *            1 课程 ID
+	 * @param type
+	 *            1 课程库course 2 精品课goods
 	 * @param state
 	 *            0 删除 1 收藏
 	 * @return
@@ -53,10 +58,11 @@ public class CollectionController {
 	public Map<String, Object> collectionVideo(@RequestParam(required = true) String userId,
 			@RequestParam(required = true) String videoId,
 			@RequestParam(required = true) String courseId,
+			@RequestParam(defaultValue="1") int type,
 			@RequestParam(required = true) String state) {
 		try {
 			if(Integer.parseInt(state)==1){
-				Collection c = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(courseId));
+				Collection c = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(courseId),type);
 				if(c!=null){
 					return MapResult.initMap();
 				}
@@ -64,6 +70,7 @@ public class CollectionController {
 				collection.setVideoId(Integer.parseInt(videoId));
 				collection.setUserId(Integer.parseInt(userId));
 				collection.setCourseId(Integer.parseInt(courseId));
+				collection.setType(type);
 				if(collectionService.insert(collection)==1){
 					return MapResult.initMap();
 				}else{
@@ -101,18 +108,36 @@ public class CollectionController {
 			JSONArray result = new JSONArray();
 			for(Collection c:collectionList){
 				Video video = videoService.getVideoById(c.getVideoId());
-				Course course = courseService.getCourseById(c.getCourseId()+"");
-				if(video!=null&&course!=null){
-					JSONObject jsonObj = new JSONObject();
-					jsonObj.put("videoId", video.getId());
-					jsonObj.put("videoName", video.getName());
-					jsonObj.put("videoPic", video.getPic());
-					jsonObj.put("videoUrl", video.getAddress());
-					jsonObj.put("courseId", course.getId());
-					jsonObj.put("coursePic", course.getAddress());
-					jsonObj.put("totalTime", course.getTotalTime());
-					jsonObj.put("subAllNum", course.getSubAllNum());
-					result.add(jsonObj);
+				if(c.getType()==1){
+					Course course = courseService.getCourseById(c.getCourseId()+"");
+					if(video!=null&&course!=null){
+						JSONObject jsonObj = new JSONObject();
+						jsonObj.put("videoId", video.getId());
+						jsonObj.put("videoName", video.getName());
+						jsonObj.put("videoPic", video.getPic());
+						jsonObj.put("videoUrl", video.getAddress());
+						jsonObj.put("courseId", course.getId());
+						jsonObj.put("coursePic", course.getAddress());
+						jsonObj.put("totalTime", course.getTotalTime());
+						jsonObj.put("subAllNum", course.getSubAllNum());
+						jsonObj.put("type", c.getType());
+						result.add(jsonObj);
+					}
+				}else{
+					Goods course = goodsService.getById(c.getCourseId()+"");
+					if(video!=null&&course!=null){
+						JSONObject jsonObj = new JSONObject();
+						jsonObj.put("videoId", video.getId());
+						jsonObj.put("videoName", video.getName());
+						jsonObj.put("videoPic", video.getPic());
+						jsonObj.put("videoUrl", video.getAddress());
+						jsonObj.put("courseId", course.getId());
+						jsonObj.put("coursePic", course.getUrl());
+						jsonObj.put("totalTime", course.getTotaltime()+"分钟");
+						jsonObj.put("subAllNum", course.getVideonum());
+						jsonObj.put("type", c.getType());
+						result.add(jsonObj);
+					}
 				}
 			}
 			ret.put("result", result);
@@ -131,7 +156,7 @@ public class CollectionController {
 	@RequestMapping(value = "/getColletionState")
 	@ResponseBody
 	public Map<String, Object> getColletionState(@RequestParam(required = false) String userId,
-			@RequestParam(required = true) String collectionId,@RequestParam(required = true) String type) {
+			@RequestParam(required = true) String collectionId,@RequestParam(required = true) int type) {
 		try{
 			if (StringUtils.isBlank(collectionId))
 				return MapResult.initMap(ApiCode.PARG_ERR, "视频id为空");
@@ -139,7 +164,7 @@ public class CollectionController {
 			Map<String, Object> ret = MapResult.initMap();
 			int collectionState = 0;
 			if (!StringUtils.isBlank(userId)){
-				Collection collection = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(collectionId));
+				Collection collection = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(collectionId),type);
 				if(collection!=null)
 					collectionState = 1;
 			}

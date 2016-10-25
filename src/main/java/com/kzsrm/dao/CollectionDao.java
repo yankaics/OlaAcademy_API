@@ -21,6 +21,7 @@ public class CollectionDao<E> extends BaseMybatisDao<Collection, String> {
 		map.put("userId", collection.getUserId());
 		map.put("videoId", collection.getVideoId());
 		map.put("courseId", collection.getCourseId());
+		map.put("type", collection.getType());
 		return this.getSqlSession().insert(this.getMybatisMapperNamesapce() + ".insert", map);
 	}
 

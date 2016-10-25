@@ -6,16 +6,17 @@
     <result column="userId" property="userId" jdbcType="INTEGER" />
     <result column="videoId" property="videoId" jdbcType="INTEGER" />
     <result column="courseId" property="courseId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, userId, videoId, courseId
+    id, userId, videoId, courseId,type
   </sql>
   
   <select id="getByUserId" resultMap="BaseResultMap" parameterType="map" >
     select 
     <include refid="Base_Column_List" />
     from user_video
-    where userId = #{userId,jdbcType=VARCHAR}
+    where userId = #{userId,jdbcType=VARCHAR} 
   </select>
   
   <select id="getByVideoId" resultMap="BaseResultMap" parameterType="map" >
@@ -37,6 +38,7 @@
     from user_video
     where userId = #{userId,jdbcType=INTEGER}
     and courseId = #{courseId,jdbcType=INTEGER}
+    and type = #{type,jdbcType=INTEGER}
   </select>
   <delete id="deleteByUserId" parameterType="java.lang.Integer" >
     delete from user_video
@@ -48,8 +50,9 @@
     and videoId = #{videoId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kzsrm.model.Collection" >
-    insert into user_video (id, userId, videoId,courseId)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{videoId,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER})
+    insert into user_video (id, userId, videoId,courseId,type)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{videoId,jdbcType=INTEGER},
+     #{courseId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.kzsrm.model.Collection" >
     insert into user_video

@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,9 +34,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipayCore;
 import com.alipay.util.AlipayNotify;
+import com.kzsrm.model.CoinHistory;
 import com.kzsrm.model.Course;
 import com.kzsrm.model.OrderInfo;
 import com.kzsrm.model.User;
+import com.kzsrm.service.CoinHistoryService;
 import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.OrderInfoService;
 import com.kzsrm.service.UserService;
@@ -57,7 +60,8 @@ public class PayController {
 	private UserService userService;
 	@Resource
 	private GoodsService goodsService;
-
+	@Resource
+	private CoinHistoryService coinHistoryService;
 	/**
 	 * 是否显示支付模块(苹果审核)
 	 * 
@@ -81,7 +85,7 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.2.4");
+		jsonObj.put("version", "1.2.5");
 		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;
@@ -97,13 +101,19 @@ public class PayController {
 	public Map<String, Object> getAliOrderInfo(
 			@RequestParam(required = true) String userId,
 			@RequestParam(required = true) String type,
-			@RequestParam(required = true) String goodsId) throws Exception {
+			@RequestParam(required = true) String goodsId,
+			@RequestParam(defaultValue="0") int coin) throws Exception {
+		
+		User u = userService.selectUser(Integer.parseInt(userId));
+		if(type.equals("3")&&Integer.parseInt(u.getCoin())<coin){
+			return MapResult.initMap(10001, "欧拉币不足");
+		}
 
 		String out_trade_no = generateOrderNo();
 
 		try {
 			// 数据库中创建订单信息
-			createOrder(out_trade_no, userId, type, goodsId);
+			createOrder(out_trade_no, userId, type, goodsId,coin);
 
 			String price = "0.01";
 			String body = "欧拉会员";
@@ -112,7 +122,11 @@ public class PayController {
 			} else if (type.equals("2")) { // 年度会员
 				price = "158";
 			} else {
-				price = goodsService.getById(goodsId).getPrice() + "";
+				float discountPrice = goodsService.getById(goodsId).getPrice();
+				if(coin>0){ //欧拉币兑换，最多抵10%
+					discountPrice -= coin*0.05;
+				}
+				price = discountPrice + "";
 				body = goodsService.getById(goodsId).getName();
 			}
 
@@ -149,12 +163,18 @@ public class PayController {
 	public Map<String, Object> getWXPayReq(
 			@RequestParam(required = true) String userId,
 			@RequestParam(required = true) String type,
-			@RequestParam(required = true) String goodsId) throws Exception {
+			@RequestParam(required = true) String goodsId,
+			@RequestParam(defaultValue="0") int coin) throws Exception {
+		
+		User u = userService.selectUser(Integer.parseInt(userId));
+		if(type.equals("3")&&Integer.parseInt(u.getCoin())<coin){
+			return MapResult.initMap(10001, "欧拉币不足");
+		}
 
 		String out_trade_no = generateOrderNo();
 
 		// 数据库中创建订单信息
-		if (createOrder(out_trade_no, userId, type, goodsId) != 1) {
+		if (createOrder(out_trade_no, userId, type, goodsId,coin) != 1) {
 			return MapResult.failMap();
 		}
 
@@ -173,8 +193,11 @@ public class PayController {
 			parameters.put("total_fee", "15800");
 			parameters.put("body", "欧拉会员");
 		} else {
-			parameters.put("total_fee", goodsService.getById(goodsId)
-					.getPrice() * 100 + "");
+			float discountPrice = goodsService.getById(goodsId).getPrice();
+			if(coin>0){ //欧拉币兑换，最多抵10%
+				discountPrice -= coin*0.05;
+			}
+			parameters.put("total_fee", (int)(discountPrice * 100) + "");
 			parameters.put("body", goodsService.getById(goodsId).getName());
 		}
 
@@ -240,8 +263,8 @@ public class PayController {
 	 *            userId
 	 */
 	private int createOrder(String tradeNo, String userId, String type,
-			String goodsId) {
-		// 更新购买数量
+			String goodsId,int coin) {
+		// 更新购买数量(提交订单，购买量即＋1)
 		if ("3".equals(type)) {
 			goodsService.updateGoods(goodsId);
 		}
@@ -252,6 +275,7 @@ public class PayController {
 		orderInfo.setType(Integer.parseInt(type));
 		orderInfo.setGoodsId(goodsId);
 		orderInfo.setStatus(0);
+		orderInfo.setCoin(coin);
 		orderInfo.setCreateTime(new Date());
 		return orderInfoService.createOrderInfo(orderInfo);
 	}
@@ -441,10 +465,18 @@ public class PayController {
 		OrderInfo orderInfo = orderInfoService.getInfoByTradeNo(tradeNo);
 		orderInfo.setStatus(1);
 		orderInfoService.updateOrderInfo(orderInfo); // 更新订单状态
+		User user = userService.selectUser(orderInfo.getUserId());
 		if (orderInfo.getType() == 3) {
+			if(orderInfo.getCoin()>0){
+				// 欧拉币明细记录
+				updateCoinHistory("购买课程抵用",orderInfo.getUserId(),7,-orderInfo.getCoin());
+			}
+			// 首次购买课程赠送150欧拉币
+			if(coinHistoryService.validateFirstPay(orderInfo.getUserId(), 5)==1){
+				updateCoinHistory("首次购买课程赠送",orderInfo.getUserId(),5,150);
+			}
 			return 1;
 		}
-		User user = userService.selectUser(orderInfo.getUserId());
 		Calendar c = Calendar.getInstance();
 		try {
 			// 更新会员状态
@@ -465,11 +497,27 @@ public class PayController {
 					c.add(Calendar.MONTH, 6);
 				}
 			}
+			// 首次购买会员赠送100欧拉币
+			if(coinHistoryService.validateFirstPay(orderInfo.getUserId(), 4)==1){
+				updateCoinHistory("首次购买会员",orderInfo.getUserId(),4,100);
+			}
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return userService.updateVipTime(orderInfo.getUserId(), c.getTime());
+	}
+	
+	// 更新欧拉币使用明细
+	private void updateCoinHistory(String name,int userId,int type,int dealNum){
+		CoinHistory dailyAct = new CoinHistory();
+		dailyAct.setUserId(userId);
+		dailyAct.setType(type);
+		dailyAct.setDealNum(dealNum);
+		dailyAct.setName(name);
+		SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd");
+		dailyAct.setDate(form.format(new Date()));
+		coinHistoryService.insertData(dailyAct);
 	}
 
 	/**

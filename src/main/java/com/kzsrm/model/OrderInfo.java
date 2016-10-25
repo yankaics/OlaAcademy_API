@@ -14,6 +14,8 @@ public class OrderInfo {
 
     private Integer type;  //1 月度会员 2 年度会员 3 成套视频
     
+    private Integer coin; //使用的欧拉币
+    
     private Integer status; //订单这状态
     
     private Date createTime;
@@ -64,6 +66,14 @@ public class OrderInfo {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Integer getCoin() {
+		return coin;
+	}
+
+	public void setCoin(Integer coin) {
+		this.coin = coin;
 	}
 
 	public Date getCreateTime() {

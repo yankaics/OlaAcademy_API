@@ -12,7 +12,7 @@
   <sql id="Base_Column_List" >
     id, sid, userid, isright, oid, createTime
   </sql>
-  <!-- 获取作业已做题数量 -->
+  <!-- 获取某套作业 某个用户已做题数量 -->
   <select id="getWorkHasDoneSubNum" resultType="java.lang.Integer" parameterType="map" >
     select count(distinct sl.sid)
 	from subjectWorkLog sl ,homework_subject hs
@@ -20,6 +20,28 @@
 		and sl.userid =#{userId,jdbcType=VARCHAR}
 		and hs.homeworkId = #{homeworkId,jdbcType=INTEGER}
   </select>
+  
+  <!-- 获取某套作业 所有群成员数以及已做题数量 -->
+  <select id="getWorkHasDoneSubNumByGroup" resultType="java.util.HashMap" parameterType="map" >
+    select count(distinct sl.id) as subjectCount, count(distinct sl.userid) as userCount
+	from subjectWorkLog sl ,homework_subject hs, user_group ug
+	where sl.sid = hs.subjectId
+		and sl.userid = ug.userId
+		and ug.groupId =#{groupId,jdbcType=VARCHAR}
+		and hs.homeworkId = #{homeworkId,jdbcType=INTEGER}
+  </select>
+  
+   <!-- 获取某套作业 所有群成员已做题正确数量 -->
+  <select id="getWorkRightSubNumByGroup" resultType="java.lang.Integer" parameterType="map" >
+    select count(distinct sl.id)
+	from subjectWorkLog sl ,homework_subject hs, user_group ug
+	where sl.sid = hs.subjectId
+		and sl.userid = ug.userId
+		and ug.groupId =#{groupId,jdbcType=VARCHAR}
+		and hs.homeworkId = #{homeworkId,jdbcType=INTEGER} 
+		and sl.isright = 1
+  </select>
+  
   <!-- 按条件查询 -->
   <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
     select 

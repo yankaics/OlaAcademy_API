@@ -23,6 +23,7 @@ public class OrderInfoDao<E> extends BaseMybatisDao<OrderInfo, String> {
 		map.put("goodsId", orderInfo.getGoodsId());
 		map.put("type", orderInfo.getType());
 		map.put("status", orderInfo.getStatus());
+		map.put("coin", orderInfo.getCoin());
 		map.put("createTime", orderInfo.getCreateTime());
 		return this.getSqlSession().insert(
 				this.getMybatisMapperNamesapce() + ".insert", map);

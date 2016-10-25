@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import net.sf.json.JsonConfig;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kzsrm.model.AttentionShip;
 import com.kzsrm.service.AttentionShipService;
-import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
 
 @Controller

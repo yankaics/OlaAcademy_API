@@ -21,16 +21,13 @@
 		<result column="status" jdbcType="VARCHAR" property="status" />
 		<result column="avator" jdbcType="VARCHAR" property="avator" />
 		<result column="level" jdbcType="VARCHAR" property="level" />
-		<!-- <result column="regnum" jdbcType="INTEGER" property="regnum" /> -->
-		<!-- <result column="lastreg" jdbcType="VARCHAR" property="lastreg" /> -->
 		<result column="honor" jdbcType="VARCHAR" property="honor" />
 		<result column="learntime" jdbcType="VARCHAR" property="learntime" />
 		<result column="examtype" jdbcType="VARCHAR" property="examtype" />
 		<result column="vipTime" jdbcType="TIMESTAMP" property="vipTime" />
 		<result column="isActive" jdbcType="INTEGER" property="isActive" />
 		<result column="realName" jdbcType="VARCHAR" property="realName" />
-		<result column="infoPerfectLev" jdbcType="VARCHAR" property="infoPerfectLev" />
-
+		<result column="coin" jdbcType="VARCHAR" property="coin" />
 		<result column="yzm" jdbcType="VARCHAR" property="yzm" />
 
 	</resultMap>
@@ -38,8 +35,8 @@
 		id, name, age, sex, phone, email, local,
 		birthday,sign,
 		regtime,qq,
-		logintime,isActive,realName,infoPerfectLev,avator,sign,level,honor,learntime,isActive,realName,infoPerfectLev,
-		status,vipTime
+		logintime,isActive,realName,avator,sign,level,honor,learntime,isActive,realName,coin,
+		status,vipTime,examtype
 	</sql>
 
 	<select id="getUserBySessionId" parameterType="java.lang.Integer"
@@ -75,6 +72,21 @@
 		from user
 		where phone = #{phone}
 	</select>
+	
+	<!-- 获取群成员用户 -->
+  	<select id="getByGroupId" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    u.id,u.name,u.avator,u.local
+    from user u,user_group ug
+    <where>
+    		ug.groupId = #{groupId,jdbcType=VARCHAR}
+    		and u.id = ug.userId 
+    		order by regtime desc
+    		<if test="pageIndex != null">
+				limit #{pageIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+			</if>
+    </where>
+  	</select>
 
 	<!-- 根据id删除用户 -->
 	<delete id="deleteById" parameterType="java.lang.Integer">
@@ -85,6 +97,10 @@
 
 	<insert id="insert" parameterType="map" keyProperty="id"
 		useGeneratedKeys="true">
+		<!-- 插入前获取对象id  -->
+		<selectKey order="AFTER" resultType="int" keyProperty="id"  >
+			select last_insert_id()
+		</selectKey>
 		insert into user
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="id != null">
@@ -116,6 +132,12 @@
 			</if>
 			<if test="logintime != null">
 				logintime,
+			</if>
+			<if test="learntime != null">
+				learntime,
+			</if>
+			<if test="coin != null">
+				coin,
 			</if>
 			<if test="status != null">
 				status,
@@ -155,6 +177,12 @@
 			</if>
 			<if test="logintime != null">
 				#{logintime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="learntime != null">
+				#{learntime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="coin != null">
+				#{coin,jdbcType=TIMESTAMP},
 			</if>
 			<if test="status != null">
 				#{status,jdbcType=VARCHAR},
@@ -227,18 +255,13 @@
 			<if test="realName != null">
 				realName = #{realName,jdbcType=VARCHAR},
 			</if>
-			<if test="infoPerfectLev != null">
-				infoPerfectLev = #{infoPerfectLev,jdbcType=VARCHAR}
+			<if test="coin != null">
+				coin = #{coin,jdbcType=VARCHAR}
 			</if>
 		</set>
 		where id = #{id,jdbcType=INTEGER} or phone = #{phone,jdbcType=VARCHAR}
 	</update>
 
-
-	<update id="getBatchQuartz">
-		update sign set antCoin = (antCoin - 1) ;
-	</update>
-	
 	<update id="updateUserVIPTime" parameterType="map">
 		update user
 		<set>

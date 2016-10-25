@@ -238,7 +238,7 @@ public class CourseController {
 			String isCollect = "0";
 			if(!StringUtils.isEmpty(userId)){
 				User user = userService.selectUser(Integer.parseInt(userId));
-				Collection c = collectionService.getByUserIdAndVideoId(user.getId(), Integer.parseInt(pointId));
+				Collection c = collectionService.getByUserIdAndVideoId(user.getId(), Integer.parseInt(pointId),1);
 				if(c!=null){
 					isCollect = "1";
 				}

@@ -8,10 +8,11 @@
     <result column="tradeNo" property="tradeNo" jdbcType="VARCHAR" />
     <result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="coin" property="coin" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tradeNo, userId, goodsId, type, status,createTime
+    id, tradeNo, userId, goodsId, type, status,coin,createTime
   </sql>
   
   <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -46,9 +47,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kzsrm.model.OrderInfo" >
-    insert into orderInfo (id, userId, type, tradeNo, goodsId, status,createTime)
+    insert into orderInfo (id, userId, type, tradeNo, goodsId, status,coin,createTime)
     values (#{id,jdbcType=INTEGER},#{userId,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
-    #{tradeNo,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+    #{tradeNo,jdbcType=VARCHAR}, #{goodsId,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+    #{coin,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.CheckInfo" >
     update orderInfo

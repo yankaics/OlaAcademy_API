@@ -12,6 +12,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kzsrm.model.Group;
 import com.kzsrm.model.Homework;
 import com.kzsrm.model.Subject;
+import com.kzsrm.model.User;
 import com.kzsrm.model.UserGroup;
 import com.kzsrm.service.GroupService;
 import com.kzsrm.service.HomeworkService;
@@ -182,12 +184,16 @@ public class HomeworkController {
 	@ResponseBody
 	@RequestMapping(value = "/deployHomework")
 	public Map<String, Object> deployHomework(
-			@RequestParam(required = true) String groupId,
+			@RequestParam(required = true) String groupIds,
 			@RequestParam(required = true) String name,
 			@RequestParam(required = true) String subjectIds){
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			homeworkService.createHomework(groupId, name, subjectIds);
+			for(String groupId : groupIds.split(",")){
+				if(!TextUtils.isEmpty(groupId)){
+					homeworkService.createHomework(groupId, name, subjectIds);
+				}
+			}
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);
@@ -221,14 +227,27 @@ public class HomeworkController {
 			List<Homework> workList = homeworkService.getHomeworkList(userId, homeworkId, pageSize, type);
 			JSONArray homeworkList = new JSONArray();
 			for (Homework homework : workList) {
-				int count = subjectService.getSubNumByHomework(homework.getId()+"");
+				
 				JSONObject jsonObj = JSONObject.fromObject(homework,
 						jsonConf);
-				jsonObj.put("count", count);
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm");
-				jsonObj.put("finishedCount", homeworkService.getHasDoneSubNum(homework.getId(), userId));
 				jsonObj.put("time", sdf.format(homework.getCreateTime()));
+				int count = subjectService.getSubNumByHomework(homework.getId()+""); //该套题下的题目数
+				if(type==1){  //学生
+					jsonObj.put("count", count);
+					int finishedCount = homeworkService.getHasDoneSubNum(homework.getId(), userId);
+					jsonObj.put("finishedCount", finishedCount);
+					jsonObj.put("finishedPercent", count>0?finishedCount*100/count:0);
+				}else if(type==2){ // 老师
+					// 所有群成员数量
+					int allUserCount = userService.getGroupMember(homework.getGroupId(),0,0).size();
+					jsonObj.put("count", count);
+					// 群中所有答题用户数及共完成的题目数量
+					Map<String, Long> countMap = homeworkService.getHasDoneSubNumByGroup(homework.getId()+"", homework.getGroupId());
+					jsonObj.put("finishedCount", countMap.get("userCount"));
+					jsonObj.put("finishedPercent", allUserCount>0?countMap.get("userCount")*100/allUserCount:0);
+				}
 				homeworkList.add(jsonObj);
 			}
 			ret.put("result", homeworkList);
@@ -240,7 +259,7 @@ public class HomeworkController {
 	}
 	
 	/**
-	 * 获取作业对应的测试题
+	 * 获取作业对应的测试题（学生）
 	 * @param pointId		知识点id
 	 * @return
 	 */
@@ -255,6 +274,57 @@ public class HomeworkController {
 			Map<String, Object> ret = MapResult.initMap();
 			List<Subject> subList = subjectService.getSubjectByHomework(homeworkId);
 			ret.put("result", subList);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 获取学生作业完成情况（老师）
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getHomeworkStatistics")
+	public Map<String, Object> getHomeworkStatistics(@RequestParam(required = true) String groupId,
+			@RequestParam(required = true) String homeworkId,@RequestParam(defaultValue="1") int pageIndex,
+			@RequestParam(defaultValue="20") int pageSize) {
+		try{
+			if (StringUtils.isBlank(groupId))
+				return MapResult.initMap(ApiCode.PARG_ERR, "群id为空");
+			if (StringUtils.isBlank(homeworkId))
+				return MapResult.initMap(ApiCode.PARG_ERR, "作业id为空");
+			Map<String, Object> ret = MapResult.initMap();
+			List<User> userList = userService.getGroupMember(groupId,pageIndex,pageSize);
+			JSONObject result = new JSONObject();
+			// 群中所有答题用户数及共完成的题目数量
+			Map<String, Long> countMap = homeworkService.getHasDoneSubNumByGroup(homeworkId, groupId);
+			long groupFinishedCount = countMap.get("subjectCount");
+			long groupFinishUserCount = countMap.get("userCount");
+			// 群中所有用户共完成的题目中回答正确的数量
+			int groupRightFinishedCount = homeworkService.getRightSubNumByGroup(homeworkId, groupId);
+			// 某套作业的题目总数
+			int sujectTotalcount = subjectService.getSubNumByHomework(homeworkId);
+			// 所有群成员数量
+			int allUserCount = userService.getGroupMember(groupId,0,0).size();
+			result.put("unfinishedCount", allUserCount>groupFinishUserCount?allUserCount-groupFinishUserCount:0);
+			result.put("finishedCount",groupFinishUserCount);
+			result.put("correctness", groupFinishedCount>0?groupRightFinishedCount*100/groupFinishedCount:0);
+			JSONArray statisticsList = new JSONArray();
+			for(User u: userList){
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("userId", u.getId());
+				jsonObj.put("userName", u.getName());
+				jsonObj.put("userAvatar", u.getAvator());
+				jsonObj.put("location", u.getLocal());
+				// 单一用户某套作业的完成数
+				int finishedCount = homeworkService.getHasDoneSubNum(Integer.parseInt(homeworkId), u.getId()+"");
+				jsonObj.put("finished", finishedCount*100/sujectTotalcount);
+				statisticsList.add(jsonObj);
+			}
+			result.put("statisticsList", statisticsList);
+			ret.put("result", result);
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);

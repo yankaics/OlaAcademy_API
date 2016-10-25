@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

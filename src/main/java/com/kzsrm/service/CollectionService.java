@@ -38,9 +38,10 @@ public interface CollectionService {
 	 * 
 	 * @param userId
 	 *            id
+	 *            type 1 课程库（course）视频  2 精品课（goods）视频
 	 * @return
 	 */
-	Collection getByUserIdAndVideoId(Integer userId,Integer videoId);
+	Collection getByUserIdAndVideoId(Integer userId,Integer objectId,int type);
 	
 	/**
 	 * 删除收藏

@@ -6,6 +6,7 @@ public class Collection {
 	private Integer userId;
 	private Integer videoId;
 	private Integer courseId;
+	private Integer type; // 1课程库course 2精品课 goods
 	
 	public Integer getId() {
 		return id;
@@ -30,6 +31,12 @@ public class Collection {
 	}
 	public void setCourseId(Integer courseId) {
 		this.courseId = courseId;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 }

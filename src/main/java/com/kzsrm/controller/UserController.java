@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,9 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
 import com.alibaba.fastjson.JSONObject;
-import com.kzsrm.model.Sign;
+import com.kzsrm.model.CoinHistory;
 import com.kzsrm.model.User;
 import com.kzsrm.model.Yzm;
+import com.kzsrm.service.CoinHistoryService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ApiCode;
 import com.kzsrm.utils.ConfigUtil;
@@ -43,6 +45,9 @@ import com.kzsrm.utils.Tools;
 public class UserController extends SimpleFormController {
 	@Resource
 	private UserService userService;
+	@Resource
+	private CoinHistoryService dailyService;
+	
 	private static Logger logger = LoggerFactory.getLogger(User.class);
 
 	/**
@@ -89,20 +94,21 @@ public class UserController extends SimpleFormController {
 						if (!yzmList.getYzm().trim().equals(code)) {
 							return MapResult.initMap(ApiCode.PARG_ERR, "验证码输入有误");
 						}
-						Sign sign = new Sign();
-						sign.setPhone(phone);
-						sign.setSignNum(100);
-						this.userService.insertSign(sign);
 						u.setPhone(phone);
 						u.setName("小欧"+phone.substring(7, 11));
 						u.setRegtime(new Date());
 						u.setPasswd(MD5.md5(passwd));
 						u.setRegtime(new Date());
+						u.setLogintime(new Date());
+						u.setLearntime("1");
+						u.setCoin("20");
 						u.setStatus(status);
 						u.setIsActive(1);// 未激活
 						Map<String, Object> maps = userService.insertUser(u);
 						Map<String, Object> result = MapResult.initMap();
 						if (Integer.parseInt(maps.get("data").toString()) == 1) {
+							updateCoinHistroty("新用户注册",u.getId(),3,20); //注册获得欧拉币
+							updateCoinHistroty("每日签到",u.getId(),1,5); //签到获得欧拉币
 							result = MapResult.initMap();
 						} else {
 							result = MapResult.failMap();
@@ -118,6 +124,19 @@ public class UserController extends SimpleFormController {
 			logger.error("", e);
 			return MapResult.initMap(ApiCode.PARG_ERR, "参数错误");
 		}
+	}
+	
+	private void updateCoinHistroty(String name,int userId,int type,int dealNum){
+		if(type==1&&dailyService.getCheckInStatus(userId)==1)
+			return;
+		CoinHistory dailyAct = new CoinHistory();
+		dailyAct.setUserId(userId);
+		dailyAct.setType(type);
+		dailyAct.setDealNum(dealNum);
+		dailyAct.setName(name);
+		SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd");
+		dailyAct.setDate(form.format(new Date()));
+		dailyService.insertData(dailyAct);
 	}
 
 	/**
@@ -194,14 +213,22 @@ public class UserController extends SimpleFormController {
 			@RequestParam(value = "avator", required = false) String avator,
 			@RequestParam(value = "sex", required = false) String sex,
 			@RequestParam(value = "local", required = false) String local,
+			@RequestParam(value = "realName", required = false) String realName,
+			@RequestParam(value = "examType", required = false) String examType,
 			@RequestParam(value = "descript", required = false) String descript) {
 		try {
-			User user = new User();
+			User user = userService.selectUser(Integer.parseInt(id));
 			user.setId(Integer.parseInt(id));
 			user.setAvator(avator);
 			user.setName(name);
 			user.setSex(sex);
 			user.setSign(descript);
+			user.setExamtype(examType);
+			user.setRealName(realName);
+			//首次完善资料赠送50欧拉币
+			if(dailyService.validateFirstPay(Integer.parseInt(id), 8)==1){
+				updateCoinHistroty("完善个人资料", Integer.parseInt(id), 8, 50);
+			}
 			user.setLocal(local);
 			return userService.updateUser(user);
 		} catch (Exception e) {
@@ -222,12 +249,15 @@ public class UserController extends SimpleFormController {
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("id", user.getId());
 			jsonObj.put("name", user.getName());
+			jsonObj.put("realName", user.getRealName());
 			jsonObj.put("phone", user.getPhone());
 			jsonObj.put("avator", user.getAvator());
 			jsonObj.put("age", user.getAge());
 			jsonObj.put("sex", user.getSex());
 			jsonObj.put("sign", user.getSign());
 			jsonObj.put("signInDays", user.getLearntime());
+			jsonObj.put("coin", user.getCoin());
+			jsonObj.put("examtype", user.getExamtype());
 			jsonObj.put("isActive", user.getIsActive());
 			jsonObj.put("vipTime", DateUtil.getDifferSec(new Date(), user.getVipTime())>0?DateUtil.getDifferSec(new Date(), user.getVipTime()):0);
 			result.put("data", jsonObj);
@@ -366,98 +396,13 @@ public class UserController extends SimpleFormController {
 	}
 
 	/**
-	 * 签到
-	 */
-	@RequestMapping(value = "userSignIn")
-	@ResponseBody
-	public Map<String, Object> userSignIn(HttpServletRequest httpServletRequest,
-			@RequestParam(value = "uid", required = false) int uid,
-			@RequestParam(value = "phone", required = false) String phone) throws ParseException {
-		// 查询该用户签到
-		Sign listSign = userService.getSign(phone);
-		if (listSign != null) {
-			Sign s = new Sign();
-			s.setPhone(phone);
-			s.setUid(uid);
-			// 最后签到和当前差天数
-			System.out.println(listSign.getLastSignDay() + "    " + new Date());
-			int diffDay = DateUtil.getDifferSec(listSign.getLastSignDay(), new Date());
-			if (diffDay == 0) {
-				return MapResult.initMap(ApiCode.PARG_ERR, "今天已经签到啦");
-			} else if (diffDay == 1) {
-				System.out.println(listSign.getSignNum());
-				int status = listSign.getSignNum();
-				int signTotalNum = listSign.getSignTotalNum();
-				if (signTotalNum == 0) {
-					signTotalNum = 1;
-				}
-				if (status == 0) {
-					status += 2;
-					s.setSignNum(listSign.getSignNum() + 2);
-				} else {
-					status += 1;
-					s.setSignNum(listSign.getSignNum() + 1);
-				}
-				int totalSignNum = 0;
-				if (status == 1) {
-					totalSignNum += 1;
-				} else if (status == 2) {
-					totalSignNum += 2;
-				} else if (status == 3) {
-					totalSignNum += 4;
-				} else if (status == 4) {
-					totalSignNum += 8;
-				} else if (status == 5) {
-					totalSignNum += 10;
-				} else if (status == 6) {
-					totalSignNum += 30;
-				} else if (status > 6) {
-					totalSignNum += 10;
-				}
-				if (status % 10 == 0) {
-					totalSignNum += 30;
-				}
-				System.out.println("连续打卡赠送的币    " + totalSignNum);
-				s.setAntCoin(listSign.getAntCoin() + totalSignNum);
-				s.setSignTotalNum(listSign.getSignTotalNum() + 1);
-				userService.updateSign(s);
-				return MapResult.initMap(ApiCode.PARG_ERR, "签到成功");
-			} else {
-				s.setAntCoin(1);
-				s.setSignNum(0);
-				s.setSignTotalNum(listSign.getSignTotalNum() + 1);
-				userService.updateSign(s);
-				return MapResult.initMap(ApiCode.PARG_ERR, "签到过期  已经清零");
-			}
-		} else {
-			try {
-				Sign si = new Sign();
-				si.setPhone(phone);
-				si.setUid(uid);
-				si.setSignNum(1);
-				si.setSignTotalNum(1);
-				boolean insertSign = userService.insertSign(si);
-				if (insertSign == true) {
-					return MapResult.initMap(ApiCode.PARG_ERR, "签到成功");
-				} else {
-					return MapResult.initMap(ApiCode.PARG_ERR, "签到失败");
-				}
-			} catch (Exception e) {
-				logger.error("", e);
-				return MapResult.failMap();
-			}
-		}
-	}
-
-	/**
-	 * 每天扣除100蚂蚁币
+	 * 定时器（执行方法暂时为空，无实际意义）
 	 */
 	@RequestMapping(value = "doit")
 	@ResponseBody
 	public void doit() {
 		try {
 			int result = userService.batchQuartz();
-			System.out.println("定时扣除蚂蚁币执行任务返回结果  " + result);
 		} catch (Exception e) {
 			logger.error("", e);
 		}
@@ -491,140 +436,5 @@ public class UserController extends SimpleFormController {
 		ret.put("result", fileName);
 		return ret;
 	}
-
-	/**
-	 * 发送邮箱验证码
-	 * 
-	 * 成功返回true 失败返回false
-	 * 
-	 * @return
-	 * @throws MessagingException
-	 *//*
-		 * @RequestMapping(value = "getYzmByEmail")
-		 * 
-		 * @ResponseBody public Map<String, Object>
-		 * getYzmByEmail(HttpServletRequest httpServletRequest, User user,
-		 * 
-		 * @RequestParam(value = "email", required = false) String email) throws
-		 * MessagingException { return emailZym(email, user); }
-		 */
-
-	/**
-	 * 发送邮件验证码
-	 * 
-	 * @param email
-	 * @param user
-	 * @return
-	 * @throws MessagingException
-	 */
-	/*
-	 * public Map<String, Object> emailZym(String email, User user) throws
-	 * MessagingException { if (!email.contains("@")) { return
-	 * MapResult.initMap(ApiCode.PARG_ERR, "邮箱格式错误"); } StringBuffer sb = new
-	 * StringBuffer("点击下面链接激活账号，2小时后失效，否则重新注册账号，链接只能使用一次，请尽快激活！"); String code =
-	 * SendMail.getCode(); sb.append(
-	 * "<a href=\"http://localhost:8080/kzsrm/user/mailActive?email=");
-	 * sb.append(email); sb.append("&yzm="); sb.append(code);
-	 * sb.append("\"></br>http://localhost:8080/kzsrm/user/mailActive?email=");
-	 * sb.append(email); sb.append("&yzm="); sb.append(code); sb.append("</a>");
-	 * boolean flag = false; Map<String, Object> map = MapResult.initMap(); if
-	 * (email != null) { flag = SendMail.sendMail(email, "", "", "",
-	 * sb.toString()); } // 添加验证码 User u = new User(); if (email != null) {
-	 * u.setEmail(user.getEmail()); } u.setYzm(code); u.setRegtime(new Date());
-	 * int res = 0; try { res = userService.insertYZM(u); } catch (Exception e)
-	 * { return MapResult.failMap(); } if (flag == true && res == 1) { return
-	 * map; } else { map = MapResult.initMap(ApiCode.PARG_ERR, "参数错误"); } return
-	 * map; }
-	 */
-	/*	*//**
-			 * 邮箱激活验证码
-			 * 
-			 * @param httpServletRequest
-			 * @param phone
-			 * @param email
-			 * @return
-			 *//*
-			 * @RequestMapping(value = "mailActive")
-			 * 
-			 * @ResponseBody public Map<String, Object>
-			 * mailActive(HttpServletRequest httpServletRequest, User user,
-			 * 
-			 * @RequestParam(value = "phone", required = false) String phone,
-			 * 
-			 * @RequestParam(value = "email", required = false) String email,
-			 * 
-			 * @RequestParam(value = "yzm", required = false) String yzm) { User
-			 * u = new User(); // 获取验证码发送时间 Yzm yzmList =
-			 * userService.getYzm(phone); if (yzmList == null) { return
-			 * MapResult.initMap(ApiCode.PARG_ERR, "没有发送验证码"); } String str =
-			 * yzmList.getYzm(); boolean isCodeInvalid = false; String time =
-			 * Tools.ymdhms.format(yzmList.getRegtime()); if (phone != null) {
-			 * try { isCodeInvalid = Tools.codeInvalid(time, 1); } catch
-			 * (ParseException e) { logger.error("", e); e.printStackTrace(); }
-			 * } else if (email != null) { try { isCodeInvalid =
-			 * Tools.codeInvalid(time, 0); } catch (ParseException e) {
-			 * logger.error("", e); e.printStackTrace(); } } if (isCodeInvalid
-			 * == true) { return MapResult.initMap(ApiCode.PARG_ERR, "验证码已过期");
-			 * } else { if (str.trim().equals(yzm.trim())) { u.setEmail(email);
-			 * u.setPhone(phone); u.setIsActive(2);// 已激活 Sign sign = new
-			 * Sign(); // sign. sign.setEmail(email); sign.setPhone(phone);
-			 * sign.setSignNum(100);// 注册成功即送100蚂蚁币
-			 * userService.insertSign(sign); return userService.updateUser(u); }
-			 * else { return MapResult.initMap(ApiCode.PARG_ERR, "验证码错误"); } } }
-			 */
-
-	/**
-	 * 查询手机验证码是否过期
-	 * 
-	 * @param httpServletRequest
-	 * @param phone
-	 * @param yzm
-	 *//*
-		 * @RequestMapping(value = "phoneIsInvalid")
-		 * 
-		 * @ResponseBody public Map<String, Object>
-		 * phoneIsInvalid(HttpServletRequest httpServletRequest,
-		 * 
-		 * @RequestParam(value = "phone", required = false) String phone,
-		 * 
-		 * @RequestParam(value = "yzm", required = false) String yzm) {
-		 * 
-		 * if (phone == null || yzm == null) { return
-		 * MapResult.initMap(ApiCode.PARG_ERR, "参数错误"); }
-		 * 
-		 * // 获取验证码发送时间 Yzm yzmList = userService.getYzm(phone); if (yzmList ==
-		 * null) { return MapResult.initMap(ApiCode.PARG_ERR, "没有发送验证码"); }
-		 * String str = yzmList.getYzm(); boolean isCodeInvalid = false; String
-		 * time = Tools.ymdhms.format(yzmList.getRegtime()); if (phone != null)
-		 * { try { isCodeInvalid = Tools.codeInvalid(time, 1); } catch
-		 * (ParseException e) { logger.error("", e); e.printStackTrace(); } } if
-		 * (isCodeInvalid == true) { return MapResult.initMap(ApiCode.PARG_ERR,
-		 * "验证码已过期"); } else { if (str.trim().equals(yzm.trim())) { return
-		 * MapResult.initMap(); } else { return
-		 * MapResult.initMap(ApiCode.PARG_ERR, "验证码错误"); } } }
-		 */
-
-	/*	*//**
-			 * 用户唯一性验证(手机和邮箱)
-			 * 
-			 * @param httpServletRequest
-			 * 			@return{"message":"成功","data":"true","apicode":10000}
-			 *            true 有此用户 false不存在该用户
-			 *//*
-			 * @RequestMapping(value = "userUnique")
-			 * 
-			 * @ResponseBody public Map<String, Object>
-			 * userUnique(HttpServletRequest httpServletRequest,
-			 * 
-			 * @RequestParam(value = "email", required = false) String email,
-			 * 
-			 * @RequestParam(value = "mobile", required = false) String mobile)
-			 * { try { Map<String, Object> user =
-			 * userService.selectUniqueUser(email, mobile); Map<String, Object>
-			 * map = MapResult.initMap(); if (user.get("data") == null) {
-			 * map.put("data", "false"); } else { map.put("data", "true"); }
-			 * return map; } catch (Exception e) { logger.error("", e); return
-			 * MapResult.failMap(); } }
-			 */
 
 }

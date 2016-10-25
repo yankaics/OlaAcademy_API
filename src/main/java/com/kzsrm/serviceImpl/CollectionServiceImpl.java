@@ -99,10 +99,11 @@ public class CollectionServiceImpl extends BaseServiceMybatisImpl<Collection, St
 	 * @return
 	 */
 	@Override
-	public Collection getByUserIdAndVideoId(Integer userId,Integer courseId){
+	public Collection getByUserIdAndVideoId(Integer userId,Integer objectId,int type){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("userId", userId);
-		map.put("courseId", courseId);
+		map.put("courseId", objectId);
+		map.put("type", type);
 		return colletionDao.getByUserIdAndVideoId(map);
 	}
 
