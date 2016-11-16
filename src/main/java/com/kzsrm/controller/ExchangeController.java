@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kzsrm.model.CoinHistory;
 import com.kzsrm.model.Exchange;
+import com.kzsrm.model.Material;
 import com.kzsrm.model.User;
 import com.kzsrm.service.CoinHistoryService;
 import com.kzsrm.service.ExchangeService;
+import com.kzsrm.service.MaterialService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
@@ -40,6 +42,8 @@ public class ExchangeController {
 	private ExchangeService exchangeService;
 	@Resource
 	private CoinHistoryService coinHistoryService;
+	@Resource
+	private MaterialService materialService;
 	
 	/**
 	 * 欧拉币兑换
@@ -53,7 +57,7 @@ public class ExchangeController {
 			User user = userService.selectUser(userId);
 			int coin = Integer.parseInt(user.getCoin());
 			if(coin<20){
-				return MapResult.initMap(10001, "积分不足");
+				return MapResult.initMap(10001, "积分不足，签到赚积分");
 			}else{
 				// 兑换试题
 				Exchange exchange = new Exchange();
@@ -64,6 +68,38 @@ public class ExchangeController {
 				exchangeService.insertData(exchange);
 				// 欧拉币使用明细
 				updateCoinHistory("解锁题目",user.getId(),6,-20);
+				return MapResult.initMap();
+			}
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 欧拉币兑换参考资料
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/unlockMaterial")
+	public Map<String, Object> unlockMaterial(@RequestParam(required = true) int userId,
+			@RequestParam(required = true) String materialId) {
+		try {
+			User user = userService.selectUser(userId);
+			int coin = Integer.parseInt(user.getCoin());
+			Material m = materialService.getById(materialId);
+			
+			if(coin<Integer.parseInt(m.getPrice())){
+				return MapResult.initMap(10001, "积分不足，签到赚积分");
+			}else{
+				// 兑换资料
+				Exchange exchange = new Exchange();
+				exchange.setObjectId(Integer.parseInt(materialId));
+				exchange.setUserId(userId);
+				exchange.setType("3");
+				exchange.setCreateTime(new Date());
+				exchangeService.insertData(exchange);
+				// 欧拉币使用明细
+				updateCoinHistory("解锁参考资料",user.getId(),9,-Integer.parseInt(m.getPrice()));
 				return MapResult.initMap();
 			}
 		} catch (Exception e) {

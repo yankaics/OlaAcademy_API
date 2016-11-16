@@ -75,6 +75,14 @@ public interface CourseService  extends BaseServiceMybatis<Course, String> {
 	 */
 	Integer getHasDoneRightSubNum(Integer cid, String userid, String type);
 	/**
+	 * 获取用户已做错题数
+	 * @param id
+	 * @param userid
+	 * @param type 
+	 * @return
+	 */
+	Integer getHasDoneWrongSubNum(Integer cid, String userid, String type);
+	/**
 	 * 错题集
 	 * @param userid
 	 * @param cid

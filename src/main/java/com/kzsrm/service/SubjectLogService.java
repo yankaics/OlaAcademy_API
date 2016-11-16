@@ -13,5 +13,13 @@ public interface SubjectLogService  extends BaseServiceMybatis<SubjectLog, Strin
 	 * @param userId
 	 */
 	void saveOrUpdate(Option opt, Subject sub, String userId);
+	
+	/**
+	 * 更新错题本（手动添加删除）
+	 * @param subjectId
+	 * @param type 1 添加错题 2 移除错题
+	 * @return
+	 */
+	void updateWrongSet(String userId,String subjectId, int type);
 
 }

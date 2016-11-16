@@ -168,7 +168,30 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 			return subjectLogDao.getHasRightDoneSubNum(map);
 		}
 	}
-
+	
+	/**
+	 * 获取用户已做错题数
+	 * @param id
+	 * @param userid
+	 * @param type 
+	 * @return
+	 */
+	@Override
+	public Integer getHasDoneWrongSubNum(Integer cid, String userid, String type) {
+		List<Course> courseList = getchildrenCour(cid + "", type);
+		if (courseList != null && courseList.size() > 0) {
+			int i = 0;
+			for (Course course : courseList)
+				i += getHasDoneRightSubNum(course.getId(), userid, type);
+			return i;
+		} else {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("cid", cid);
+			map.put("userid", userid);
+			return subjectLogDao.getHasDoneWrongSubNum(map);
+		}
+	}
+	
 	/**
 	 * 刷新知识点下的题目总数
 	 * @param pid 

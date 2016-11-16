@@ -68,7 +68,7 @@
 	<!-- 根据手机号和邮箱查询用户信息 -->
 	<select id="selectUser" resultMap="BaseResultMap" parameterType="map">
 		select
-		id,name,sex,phone,passwd,email,birthday,qq,regtime,logintime,avator,sign,level,honor,learntime,status,examtype
+		id,name,sex,phone,passwd,email,birthday,qq,regtime,logintime,avator,sign,level,honor,learntime,status,examtype,local
 		from user
 		where phone = #{phone}
 	</select>
@@ -76,7 +76,7 @@
 	<!-- 获取群成员用户 -->
   	<select id="getByGroupId" resultMap="BaseResultMap" parameterType="map" >
     select 
-    u.id,u.name,u.avator,u.local
+    u.id,u.name,u.avator,u.local,u.sign
     from user u,user_group ug
     <where>
     		ug.groupId = #{groupId,jdbcType=VARCHAR}

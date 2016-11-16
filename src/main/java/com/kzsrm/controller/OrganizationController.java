@@ -55,7 +55,7 @@ public class OrganizationController {
 	private CheckInService checkinService;
 
 	/**
-	 * 机构列表
+	 * 机构列表（老版本）
 	 * 
 	 * @return
 	 */
@@ -88,6 +88,53 @@ public class OrganizationController {
 				}
 				jsonArray.add(jsonobj);
 			}
+			ret.put("result", jsonArray);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 机构类型及列表 （机构 学校）
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getOrganizationInfo")
+	public Map<String, Object> getOrganizationInfo(
+			@RequestParam(required = false) String userId) {
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			List<Organization> organizationList = organizationService
+					.getAllOrganization();
+			JSONArray orgArray = new JSONArray();
+			JSONArray orgArray2 = new JSONArray();
+			JSONArray schoolArray = new JSONArray();
+			for (Organization org : organizationList) {
+				JSONObject jsonobj = JSONObject.fromObject(org, orgCf);
+				if(org.getType()==1){ //机构
+					orgArray.add(jsonobj);
+				}else if(org.getType()==2){
+					orgArray2.add(jsonobj);
+				}else if(org.getType()==3){
+					schoolArray.add(jsonobj);
+				}
+			}
+			JSONArray jsonArray = new JSONArray();
+			JSONObject orgObj = new JSONObject();
+			orgObj.put("optionName", "笔试辅导");
+			orgObj.put("optionList", orgArray);
+			jsonArray.add(orgObj);
+			JSONObject orgObj2 = new JSONObject();
+			orgObj2.put("optionName", "面试辅导");
+			orgObj2.put("optionList", orgArray2);
+			jsonArray.add(orgObj2);
+			JSONObject schoolObj = new JSONObject();
+			schoolObj.put("optionName", "学习深造");
+			schoolObj.put("optionList", schoolArray);
+			jsonArray.add(schoolObj);
 			ret.put("result", jsonArray);
 			return ret;
 		} catch (Exception e) {
@@ -139,23 +186,45 @@ public class OrganizationController {
 			@RequestParam(required = true) String orgId,
 			@RequestParam(required = true) String checkinTime,
 			@RequestParam(required = true) String userPhone,
-			@RequestParam(required = true) String type,
-			@RequestParam(required = true) String userLocal) {
+			@RequestParam(defaultValue = "1") int type,
+			@RequestParam(required = false) String userLocal) {
 		try {
 			CheckInfo checkInfo = new CheckInfo();
 			checkInfo.setOrgId(Integer.parseInt(orgId));
 			checkInfo.setCheckinTime(checkinTime);
 			checkInfo.setUserLocal(userLocal);
-			checkInfo.setType(Integer.parseInt(type));
+			checkInfo.setType(type);
 			checkInfo.setUserPhone(userPhone);
 			if (checkinService.getInfoByUserPhoneAndOrg(userPhone,
 					Integer.parseInt(orgId)) == null) {
 				if (checkinService.checkIn(checkInfo) == 1) {
 					Organization org =  organizationService.getById(orgId);
-					if(org.getId()==1||org.getId()==2){
-						SendMail.sendMail("myofficer@qq.com", "151621577@qq.com", "renjincheng@126.com", "欧拉学院报名信息", "报名人手机号:"+userPhone+"; 欲报班级："+org.getName());
-					}else{
-						SendMail.sendMail("2221650373@qq.com", "renjincheng@126.com", "contact@olaxueyuan.com", "欧拉学院报名信息", "报名人手机号:"+userPhone+"; 欲报班级："+org.getName());
+					String mailInfo = "报名人手机号:"+userPhone+"\n 所报班级："+org.getName();
+					User u = (User)userService.selectUniqueUser(userPhone).get("data");
+					if(u!=null){
+						mailInfo= "报名人:"+ (u.getRealName()==null?u.getName():u.getRealName())+"\n手机号:"+userPhone+"\n所报班级："+org.getName();
+					}
+					if(u!=null&&!StringUtils.isEmpty(u.getExamtype())){
+						mailInfo+= "\n关注领域："+u.getExamtype();
+					}
+					if(u!=null&&!StringUtils.isEmpty(u.getLocal())){
+						mailInfo+= "\n所在地区："+u.getLocal();
+					}
+					switch (org.getId()) {
+					case 1:
+						SendMail.sendMail("myofficer@qq.com", "151621577@qq.com", "renjincheng@126.com", "欧拉学院报名信息", mailInfo);
+						break;
+					case 2:
+						SendMail.sendMail("2221650373@qq.com", "renjincheng@126.com", "contact@olaxueyuan.com", "欧拉学院报名信息", mailInfo);
+						break;
+					case 3:
+					case 4:
+					case 6:
+						SendMail.sendMail("3396638086@qq.com", "renjincheng@126.com", "contact@olaxueyuan.com", "欧拉学院报名信息", mailInfo);
+						break;
+					case 7:
+						SendMail.sendMail("895290962@qq.com", "renjincheng@126.com", "contact@olaxueyuan.com", "欧拉学院报名信息", mailInfo);
+						break;
 					}
 					return MapResult.initMap();
 				} else {

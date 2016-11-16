@@ -29,4 +29,8 @@ public class SubjectLogDao<E> extends BaseMybatisDao<SubjectLog, String> {
 		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getHasRightDoneSubNum", param);
 	}
 	
+	// 统计考点做错题数
+	public Integer getHasDoneWrongSubNum(Map<String, Object> param) {
+		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getHasDoneWrongSubNum", param);
+	}
 }

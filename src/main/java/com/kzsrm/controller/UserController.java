@@ -103,7 +103,7 @@ public class UserController extends SimpleFormController {
 						u.setLearntime("1");
 						u.setCoin("20");
 						u.setStatus(status);
-						u.setIsActive(1);// 未激活
+						u.setIsActive(1);// 学生
 						Map<String, Object> maps = userService.insertUser(u);
 						Map<String, Object> result = MapResult.initMap();
 						if (Integer.parseInt(maps.get("data").toString()) == 1) {
@@ -375,9 +375,20 @@ public class UserController extends SimpleFormController {
 					u.setPasswd(passwd);
 					u.setPhone(phone);
 					try {
+						// 用户不存在 注册
 						if (map.get("data") == null) {
-							u.setIsActive(2);
-							userService.insertUser(u);
+							u.setName("小欧"+phone.substring(7, 11));
+							u.setRegtime(new Date());
+							u.setRegtime(new Date());
+							u.setLogintime(new Date());
+							u.setLearntime("1");
+							u.setCoin("20");
+							u.setIsActive(1);// 学生
+							Map<String, Object> maps = userService.insertUser(u);
+							if (Integer.parseInt(maps.get("data").toString()) == 1) {
+								updateCoinHistroty("新用户注册",u.getId(),3,20); //注册获得欧拉币
+								updateCoinHistroty("每日签到",u.getId(),1,5); //签到获得欧拉币
+							}
 						} else {
 							userService.updateUser(u);
 						}

@@ -85,7 +85,7 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.2.5");
+		jsonObj.put("version", "1.2.7");
 		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;
@@ -93,6 +93,7 @@ public class PayController {
 
 	/**
 	 * 支付宝订单信息
+	 * type 1 月会员 2 半年会员 3 商品 4 年会员 5 欧拉币
 	 * 
 	 * @return
 	 */
@@ -105,7 +106,7 @@ public class PayController {
 			@RequestParam(defaultValue="0") int coin) throws Exception {
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
-		if(type.equals("3")&&Integer.parseInt(u.getCoin())<coin){
+		if(type.equals("3")&&coin>0&&Integer.parseInt(u.getCoin())<coin){
 			return MapResult.initMap(10001, "欧拉币不足");
 		}
 
@@ -121,13 +122,15 @@ public class PayController {
 				price = "30";
 			} else if (type.equals("2")) { // 年度会员
 				price = "158";
-			} else {
+			} else if (type.equals("3")) { //精品课
 				float discountPrice = goodsService.getById(goodsId).getPrice();
 				if(coin>0){ //欧拉币兑换，最多抵10%
 					discountPrice -= coin*0.05;
 				}
 				price = discountPrice + "";
 				body = goodsService.getById(goodsId).getName();
+			}else if (type.equals("4")) { //年度会员
+				price = "298";
 			}
 
 			String orderInfo = AlipayCore.getOrderInfo(body, "订单号："
@@ -167,7 +170,7 @@ public class PayController {
 			@RequestParam(defaultValue="0") int coin) throws Exception {
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
-		if(type.equals("3")&&Integer.parseInt(u.getCoin())<coin){
+		if(type.equals("3")&&coin>0&&Integer.parseInt(u.getCoin())<coin){
 			return MapResult.initMap(10001, "欧拉币不足");
 		}
 
@@ -192,13 +195,16 @@ public class PayController {
 		} else if (type.equals("2")) { // 年度会员
 			parameters.put("total_fee", "15800");
 			parameters.put("body", "欧拉会员");
-		} else {
+		} else if (type.equals("3")){
 			float discountPrice = goodsService.getById(goodsId).getPrice();
 			if(coin>0){ //欧拉币兑换，最多抵10%
 				discountPrice -= coin*0.05;
 			}
 			parameters.put("total_fee", (int)(discountPrice * 100) + "");
 			parameters.put("body", goodsService.getById(goodsId).getName());
+		}else if (type.equals("4")) { //年度会员
+			parameters.put("total_fee", "29800");
+			parameters.put("body", "欧拉会员");
 		}
 
 		parameters.put("spbill_create_ip", InetAddress.getLocalHost()
@@ -486,15 +492,19 @@ public class PayController {
 				c.setTime(date);
 				if (orderInfo.getType() == 1) {
 					c.add(Calendar.MONTH, 1);
-				} else {
+				} else if (orderInfo.getType() == 2) {
 					c.add(Calendar.MONTH, 6);
+				}else if (orderInfo.getType() == 4) {
+					c.add(Calendar.MONTH, 12);
 				}
 			} else {
 				c.setTimeInMillis(user.getVipTime().getTime()); // 会员有效日期
 				if (orderInfo.getType() == 1) {
 					c.add(Calendar.MONTH, 1);
-				} else {
+				} else if (orderInfo.getType() == 2){
 					c.add(Calendar.MONTH, 6);
+				}else if (orderInfo.getType() == 4) {
+					c.add(Calendar.MONTH, 12);
 				}
 			}
 			// 首次购买会员赠送100欧拉币

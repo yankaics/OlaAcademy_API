@@ -23,5 +23,10 @@ public class SubjectExamLogDao<E> extends BaseMybatisDao<SubjectExamLog, String>
 	public Integer getExamHasDoneSubNum(Map<String, Object> param) {
 		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getExamHasDoneSubNum", param);
 	}
+	
+	// 统计题库错题数
+	public Integer getExamWrongSubNum(Map<String, Object> param) {
+		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getExamWrongSubNum", param);
+	}
 
 }

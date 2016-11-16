@@ -61,7 +61,8 @@ public class DailyActController {
 			List<CoinHistory> historyList = dailyService.getCoinHistoryList(userId,formatter.format(new Date()));
 			int todayCoin=0;
 			for(CoinHistory history : historyList){
-				todayCoin+=history.getDealNum();
+				if(history.getDealNum()>0)
+					todayCoin+=history.getDealNum();
 			}
 			jsonObj.put("todayCoin", todayCoin);
 			ret.put("result", jsonObj);
@@ -124,7 +125,7 @@ public class DailyActController {
 	}
 	
 	/**
-	 * 分享
+	 * 分享 (老版本 赠送2积分)
 	 * 
 	 * @return
 	 */
@@ -144,6 +145,38 @@ public class DailyActController {
 			dailyAct.setUserId(userId);
 			dailyAct.setType(2);
 			dailyAct.setDealNum(2);
+			dailyAct.setName("每日分享");
+			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd");
+			dailyAct.setDate(form.format(new Date()));
+			dailyService.insertData(dailyAct);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 分享 (老版本 赠送2积分)
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/dailyShare")
+	public Map<String, Object> dailyShare(
+			@RequestParam(required = true) int userId) {
+		try {
+			// 分享次数
+			int shareNum = dailyService.getDailyShareCount(userId);
+			if(shareNum>=2){
+				return MapResult.initMap(10001, "每日分享最多赠送10欧拉币");
+			}
+			Map<String, Object> ret = MapResult.initMap();
+			// 欧拉币明细
+			CoinHistory dailyAct = new CoinHistory();
+			dailyAct.setUserId(userId);
+			dailyAct.setType(2);
+			dailyAct.setDealNum(5);
 			dailyAct.setName("每日分享");
 			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd");
 			dailyAct.setDate(form.format(new Date()));

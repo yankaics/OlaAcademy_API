@@ -22,6 +22,15 @@
 		and sl.userid =#{userid,jdbcType=VARCHAR}
 		and cs.cid = #{cid,jdbcType=INTEGER}
   </select>
+  <!-- 获取考点已做错的题数量 -->
+  <select id="getHasDoneWrongSubNum" resultType="java.lang.Integer" parameterType="map" >
+    select count(distinct sl.sid)
+	from subjectLog sl ,course_subject cs
+	where sl.sid = cs.sid
+		and sl.isright ='0'
+		and sl.userid =#{userid,jdbcType=VARCHAR}
+		and cs.cid = #{cid,jdbcType=INTEGER}
+  </select>
   <!-- 获取考点已做题数量 -->
   <select id="getHasDoneSubNum" resultType="java.lang.Integer" parameterType="map" >
     select count(distinct sl.sid)

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.MaterialMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.Material" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="provider" property="provider" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="size" property="size" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, title, provider, url, pic,size,price,type,count, createTime
+  </sql>
+  
+  <!-- 从视图查询 -->
+  <select id="getMaterialList" resultMap="BaseResultMap" parameterType="map" >
+    select
+	<include refid="Base_Column_List" />
+	from material_attachment 
+	where createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
+	and type = #{type,jdbcType=VARCHAR}
+	order by createTime desc limit #{pageSize,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from material_attachment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <update id="updateBrowseCount" parameterType="map" >
+    update material
+    <set >
+      count = count+1 
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

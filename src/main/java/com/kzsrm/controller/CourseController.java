@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kzsrm.model.Collection;
 import com.kzsrm.model.Course;
+import com.kzsrm.model.Examination;
 import com.kzsrm.model.Homework;
 import com.kzsrm.model.Option;
 import com.kzsrm.model.Subject;
@@ -30,9 +31,11 @@ import com.kzsrm.model.Video;
 import com.kzsrm.model.VideoLog;
 import com.kzsrm.service.CollectionService;
 import com.kzsrm.service.CourseService;
+import com.kzsrm.service.ExamService;
 import com.kzsrm.service.HomeworkService;
 import com.kzsrm.service.OptionService;
-import com.kzsrm.service.PointLogService;
+import com.kzsrm.service.SubjectExamLogService;
+import com.kzsrm.service.SubjectLogService;
 import com.kzsrm.service.SubjectService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.service.VideoLogService;
@@ -51,10 +54,12 @@ public class CourseController {
 	JsonConfig homeworkJC = ComUtils.jsonConfig(new String[] { "createTime" });
 
 	@Resource private CourseService courseService;
+	@Resource private ExamService examService;
 	@Resource private VideoService videoService;
 	@Resource private VideoLogService videoLogService;
 	@Resource private SubjectService subjectService;
-	@Resource private PointLogService pointLogService;
+	@Resource private SubjectLogService subjecLogtService;
+	@Resource private SubjectExamLogService subjecExamLogtService;
 	@Resource private OptionService optionService;
 	@Resource private UserService userService;
 	@Resource private CollectionService collectionService;
@@ -151,9 +156,9 @@ public class CourseController {
 		}
 	}
 	/**
-	 * 知识型谱 （统计做题结果）
+	 * 知识型谱 （统计做题结果）旧版
 	 * @param userid	用户id
-	 * @param type		
+	 * @param type		1 题目课程 2 视频课程  固定传1
 	 * @return
 	 */
 	@ResponseBody
@@ -190,6 +195,101 @@ public class CourseController {
 			return MapResult.failMap();
 		}
 	}
+	
+	/**
+	 * 课程错题集列表
+	 * @param userid	用户id
+	 * @param type		1 考点 2 真题 3 模考
+	 * @param subjectType		1 数学 2 英语 3 逻辑 4 写作
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getWrongList")
+	public Map<String, Object> getWrongList(
+			@RequestParam(required = true) String userId,
+			@RequestParam(required = true) String type,
+			@RequestParam(required = true) String subjectType) {
+		try{
+			Map<String, Object> ret = MapResult.initMap();
+			if("1".endsWith(type)){
+				List<Course> courseList = courseService.getchildrenCour(subjectType, "1");
+				JSONArray jsonList = new JSONArray();
+				for (Course course : courseList) {
+					JSONObject jsonobj = new JSONObject();
+					jsonobj.put("id", course.getId());
+					jsonobj.put("name", course.getName());
+					jsonobj.put("subAllNum", course.getSubAllNum());
+					int wrongNum = 0;
+					if (StringUtils.isNotBlank(userId)){
+						List<Course> subList = courseService.getchildrenCour(course.getId()+"", "1");
+						for(Course subCourse : subList){
+							wrongNum+=courseService.getHasDoneWrongSubNum(subCourse.getId(), userId, "1");
+						}
+						jsonobj.put("wrongNum", wrongNum);
+					}
+					else{
+						jsonobj.put("wrongNum", "0");
+					}
+					jsonList.add(jsonobj);
+				}
+				ret.put("result", jsonList);
+			}else{
+				JSONArray jsonArray = new JSONArray();
+				List<Examination> examList = examService.getListByCour(subjectType,
+						Integer.parseInt(type)-1+""); // 真题 or 模考
+
+				for (int i = 0; i < examList.size(); i++) {
+					JSONObject jsonObj = new JSONObject();
+					Examination exam = examList.get(i);
+					jsonObj.put("id", exam.getId());
+					jsonObj.put("name", exam.getName());
+					jsonObj.put("subAllNum", examService.getSubjectNum(exam.getId()));
+					if(!StringUtils.isEmpty(userId)){
+						jsonObj.put("wrongNum", examService.getDoneWrongNum(exam.getId(), userId));
+					}else{
+						jsonObj.put("wrongNum", 0);
+					}
+					jsonArray.add(jsonObj);
+				}
+				ret.put("result", jsonArray);
+			}
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 更新错题集
+	 * @param questionType 1 考点 2模考或真题
+	 * @param type 1添加错题 2  删除错题
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/updateWrongSet")
+	public Map<String, Object> updateWrongSet(
+			@RequestParam(required = true) String userId,
+			@RequestParam(required = true) String subjectId,
+			@RequestParam(required = true) int type,
+			@RequestParam(required = true) int questionType) {
+		try{
+			if (StringUtils.isBlank(subjectId))
+				return MapResult.initMap(ApiCode.PARG_ERR, "请选择题目");
+			
+			Map<String, Object> ret = MapResult.initMap();
+			if(questionType==1){
+				subjecLogtService.updateWrongSet(userId, subjectId, type);
+			}else if(questionType==2){
+				subjecExamLogtService.updateWrongSet(userId, subjectId, type);
+			}
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
 	/**
 	 * 获取知识点对应的测试题
 	 * @param pointId		知识点id
@@ -458,7 +558,7 @@ public class CourseController {
 	 * 错题集
 	 * @param userid	用户id
 	 * @param cid		课程id(第二级)
-	 * @param type		
+	 * @param type		1 考点 2 模考或真题
 	 * @return
 	 */
 	@ResponseBody
@@ -469,8 +569,13 @@ public class CourseController {
 			@RequestParam(required = false) String type) {
 		try{
 			Map<String, Object> ret = MapResult.initMap();
-			List<Subject> SubjectList = courseService.getWrongSubSet(userid, cid, type);
-			ret.put("result", SubjectList);
+			if("1".equals(type)){
+				List<Subject> subjectList = courseService.getWrongSubSet(userid, cid, "1");
+				ret.put("result", subjectList);
+			}else{
+				List<Subject> subjectList = examService.getExamWrongSubSet(userid, cid);
+				ret.put("result", subjectList);
+			}
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);

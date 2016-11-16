@@ -42,5 +42,9 @@ public class SubjectDao<E> extends BaseMybatisDao<Subject, String> {
 	public List<Subject> getWrongSubSet(Map<String, Object> param) {
 		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getWrongSubSet", param);
 	}
+	
+	public List<Subject> getExamWrongSubSet(Map<String, Object> param) {
+		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getExamWrongSubSet", param);
+	}
 
 }

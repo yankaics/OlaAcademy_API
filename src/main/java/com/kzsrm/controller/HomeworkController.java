@@ -62,12 +62,13 @@ public class HomeworkController {
 	@RequestMapping(value = "/createGroup")
 	public Map<String, Object> createGroup(@RequestParam(required = true) String name,
 			@RequestParam(required = true) int userId,@RequestParam(required = false) String avatar,
-			@RequestParam(required = true) int type) {
+			@RequestParam(required = false) String profile,@RequestParam(required = true) int type) {
 		Group group = new Group();
 		group.setName(name);
 		group.setCreateUser(userId);
 		group.setAvatar(avatar);
 		group.setType(type);
+		group.setProfile(profile);
 		group.setCreateTime(new Date());
 		try {
 			groupService.createGroup(group);
@@ -169,6 +170,27 @@ public class HomeworkController {
 				}
 				
 			}
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 群成员
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/queryGroupMember")
+	public Map<String, Object> queryGroupMember(
+			@RequestParam(required = true) String groupId,
+			@RequestParam(defaultValue="1") int pageIndex,
+			@RequestParam(defaultValue="20") int pageSize) {
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			List<User> memberList = userService.getGroupMember(groupId,pageIndex,pageSize);
+			ret.put("result", memberList);
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);

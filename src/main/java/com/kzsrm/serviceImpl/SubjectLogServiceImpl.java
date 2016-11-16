@@ -30,7 +30,7 @@ public class SubjectLogServiceImpl extends BaseServiceMybatisImpl<SubjectLog, St
 	}
 
 	/**
-	 * 更新或保存答题记录
+	 * 更新或保存答题记录(答题过程自动记录)
 	 * @param opt
 	 * @param sub
 	 * @param userId
@@ -53,6 +53,41 @@ public class SubjectLogServiceImpl extends BaseServiceMybatisImpl<SubjectLog, St
 			slog.setSid(sub.getId()+"");
 			slog.setUserid(userId);
 			subjectLogDao.save(slog);
+		}
+	}
+	
+	/**
+	 * 更新错题本（手动添加删除）
+	 * @param subjectId
+	 * @param type 1 添加错题 2 移除错题
+	 * @return
+	 */
+	@Override
+	public void updateWrongSet(String userId,String subjectId, int type) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userid", userId);
+		map.put("sid", subjectId);
+		if(type==1){
+			List <SubjectLog> logList = subjectLogDao.getByParam(map);
+			if(logList.size()>0){
+				SubjectLog subjectLog = logList.get(0);
+				subjectLog.setOid("0");
+				subjectLog.setIsright("0");
+				subjectLogDao.update(subjectLog);
+			}else{
+				SubjectLog subjectLog = new SubjectLog();
+				subjectLog.setUserid(userId);
+				subjectLog.setSid(subjectId);
+				subjectLog.setOid("0");
+				subjectLog.setIsright("0");
+				subjectLog.setCreatetime(new Date());
+				subjectLogDao.save(subjectLog);
+			}
+		}else if(type==2){
+			List <SubjectLog> logList = subjectLogDao.getByParam(map);
+			for(SubjectLog subjectLog : logList){
+				subjectLogDao.deleteById(subjectLog.getId()+"");
+			}
 		}
 	}
 	

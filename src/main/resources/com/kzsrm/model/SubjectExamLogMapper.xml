@@ -20,6 +20,15 @@
 		and sl.userid =#{userid,jdbcType=VARCHAR}
 		and es.eid = #{eid,jdbcType=INTEGER}
   </select>
+  <!-- 获取题库已做错题数 -->
+  <select id="getExamWrongSubNum" resultType="java.lang.Integer" parameterType="map" >
+    select count(distinct sl.sid)
+	from subjectExamLog sl ,exam_subject es
+	where sl.sid = es.sid
+		and sl.userid =#{userid,jdbcType=VARCHAR}
+		and es.eid = #{eid,jdbcType=INTEGER} 
+		and sl.isright = '0'
+  </select>
   <!-- 按条件查询 -->
   <select id="getByParam" resultMap="BaseResultMap" parameterType="map" >
     select 

@@ -19,7 +19,7 @@
     t.id,t.article, t.question, t.type, t.degree, t.hint, t.allcount, t.rightcount, t.avgtime, t.pic, t.hintpic, t.videourl
   </sql>
   
-  <!-- 获取做错的题列表 -->
+  <!-- 获取考点做错的题列表 -->
   <select id="getWrongSubSet" resultMap="BaseResultMap" parameterType="map" >
     select
     <include refid="Base_Column_List" />
@@ -54,6 +54,16 @@
 	`subject` t, exam_subject s
 	WHERE t.id = s.sid
 		AND s.eid = #{examId,jdbcType=VARCHAR}
+  </select>
+   <!-- 获取模考做错的题列表 -->
+  <select id="getExamWrongSubSet" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+	from subjectExamLog sl ,exam_subject es, `subject` t
+	where sl.sid = es.eid and t.id = sl.sid
+		and sl.isright ='0'
+		and sl.userid =#{userId,jdbcType=VARCHAR}
+		and es.eid = #{examId,jdbcType=INTEGER}
   </select>
   
   <!-- 作业中试题的列表 -->
