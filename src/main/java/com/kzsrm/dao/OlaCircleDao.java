@@ -20,6 +20,14 @@ public class OlaCircleDao<E> extends BaseMybatisDao<OlaCircle, String> {
 		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getCircleList", map);
 	}
 	
+	public List<OlaCircle> getDeployPost(Map<String, Object> map) {
+		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getDeployPost", map);
+	}
+	
+	public List<OlaCircle> getReplyPost(Map<String, Object> map) {
+		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getReplyPost", map);
+	}
+	
 	public OlaCircle getByUserIdAndCourseId(String userId, String courseId){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("userid", userId);

@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kzsrm.model.CirclePraise;
 import com.kzsrm.model.Comment;
 import com.kzsrm.model.Course;
 import com.kzsrm.model.OlaCircle;
 import com.kzsrm.model.User;
+import com.kzsrm.service.CirclePraiseService;
 import com.kzsrm.service.CommentService;
 import com.kzsrm.service.CourseService;
 import com.kzsrm.service.OlaCircleService;
@@ -46,6 +48,8 @@ public class OlaCircleController {
 	@Resource
 	private OlaCircleService circleService;
 	@Resource
+	private CirclePraiseService praiseService;
+	@Resource
 	private CommentService commentService;
 	@Resource
 	private CourseService courseService;
@@ -64,6 +68,8 @@ public class OlaCircleController {
 			@RequestParam(required = false) String title,
 			@RequestParam(required = false) String content,
 			@RequestParam(required = false) String imageGids,
+			@RequestParam(required = false) String assignUser,
+			@RequestParam(defaultValue="1") int isPublic,
 			@RequestParam(required = false) String location) {
 		OlaCircle circle = new OlaCircle();
 		circle.setUserId(userId);
@@ -71,6 +77,8 @@ public class OlaCircleController {
 		circle.setContent(content);
 		circle.setImageGids(imageGids);
 		circle.setLocation(location);
+		circle.setAssignUser(assignUser);
+		circle.setIsPublic(isPublic);
 		circle.setType(2); // 帖子
 		circle.setCreateTime(new Date());
 		try {
@@ -91,12 +99,13 @@ public class OlaCircleController {
 	@ResponseBody
 	@RequestMapping(value = "/getCircleList")
 	public Map<String, Object> getCircleList(
+			@RequestParam(required = false) String userId,
 			@RequestParam(required = false) String circleId,
 			@RequestParam(defaultValue = "20") int pageSize,
 			@RequestParam(required = false) String type) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			List<OlaCircle> vlogList = circleService.getCircleList(circleId,
+			List<OlaCircle> vlogList = circleService.getCircleList(userId,circleId,
 					pageSize,type);
 			JSONArray cicleList = new JSONArray();
 			for (OlaCircle circle : vlogList) {
@@ -129,7 +138,9 @@ public class OlaCircleController {
 						jsonObj.put("content", circle.getContent());
 						jsonObj.put("imageGids", circle.getImageGids());
 						jsonObj.put("location", circle.getLocation());
-						jsonObj.put("praiseNumber", circle.getPraiseNumber());
+						jsonObj.put("praiseNumber", praiseService.queryPraiseNumber(circle.getId()+""));
+						jsonObj.put("readNumber", circle.getReadNumber());
+						jsonObj.put("commentNumber",circle.getCommentNumber());
 						cicleList.add(jsonObj);
 					}
 				}
@@ -150,15 +161,27 @@ public class OlaCircleController {
 	@ResponseBody
 	@RequestMapping(value = "/queryCircleDetail")
 	public Map<String, Object> queryCircleDetail(
-			@RequestParam(required = true) String circleId){
+			@RequestParam(required = true) String circleId,
+			@RequestParam(required = false) String userId){
 		try {
 			Map<String, Object> ret = MapResult.initMap();
 			OlaCircle circle = circleService.getById(circleId);
 			circleService.updateReadNumber(circle);  //更新浏览量
+			if(!TextUtils.isEmpty(userId)){
+				updateReadState(userId,circle); //更新消息阅读状态
+				praiseService.updateReadState(userId, circleId);
+			}
 			User postUser = userService.selectUser(circle.getUserId());
 			JSONObject jsonobj = JSONObject.fromObject(circle, circleJC);
 			jsonobj.put("userName", postUser.getName());
 			jsonobj.put("userAvatar", postUser.getAvator());
+			int isPraised = 0;
+			if(!TextUtils.isEmpty(userId)){
+				if(praiseService.queryIsPraised(userId, circleId)){
+					isPraised = 1;
+				}
+			}
+			jsonobj.put("isPraised", isPraised);
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
 			jsonobj.put("time", sdf.format(circle.getCreateTime()));
@@ -186,6 +209,21 @@ public class OlaCircleController {
 			return MapResult.failMap();
 		}
 	}
+	
+	/**
+	 * 更新留言的阅读状态
+	 * 
+	 * @return
+	 */
+	public void updateReadState(String userId, OlaCircle post) {
+		if((post.getUserId()+"").equals(userId)){
+			//更新自己所发贴
+			commentService.updateReadState(userId, post.getId()+"");
+		}else{
+			//更新自己所发贴
+			commentService.updateOtherReadState(userId, post.getId()+"");
+		}
+	}
 
 	
 	/**
@@ -195,12 +233,105 @@ public class OlaCircleController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/praiseCirclePost")
-	public Map<String, Object> praiseCirclePost(
+	public Map<String, Object> praiseCirclePost(@RequestParam(required = false) String userId,
 			@RequestParam(required = false) String circleId){
 		try {
-			OlaCircle circle = circleService.getById(circleId);
-			circleService.praiseCirclePost(circle);
+			if(TextUtils.isEmpty(userId)){
+				return MapResult.initMap(9999, "您尚未登录");
+			}
+			praiseService.praiseCircle(userId, circleId);
 			return MapResult.initMap();
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 点赞列表
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getPraiseList")
+	public Map<String, Object> getPraiseList(@RequestParam(required = true) String userId,
+			@RequestParam(required = false) String praiseId,@RequestParam(defaultValue = "20") int pageSize){
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			List<CirclePraise> praiseList = praiseService.getPraiseList(userId, praiseId, pageSize);
+			JSONArray praiseArray = new JSONArray();
+			for(CirclePraise praise:praiseList){
+				User u = userService.selectUser(Integer.parseInt(praise.getUserId()));
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("praiseId", praise.getId());
+				jsonObj.put("postId", praise.getCircleId());
+				OlaCircle circle = circleService.getById(praise.getCircleId());
+				if(circle!=null){
+					jsonObj.put("title", circle.getTitle());
+				}else{
+					jsonObj.put("title", "");
+				}
+				jsonObj.put("userId", praise.getUserId());
+				jsonObj.put("userName", u.getName());
+				jsonObj.put("userAvatar", u.getAvator());
+				SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+				jsonObj.put("time", dateFormater.format(praise.getCreateTime()));
+				jsonObj.put("isRead", praise.getIsRead());
+				praiseArray.add(jsonObj);
+			}
+			ret.put("result", praiseArray);
+			return ret;
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 个人资料及所发帖 所回答贴
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getUserPostList")
+	public Map<String, Object> getUserPostList(
+			@RequestParam(required = true) String userId){
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			JSONObject jsonObj = new JSONObject();
+			User user = userService.selectUser(Integer.parseInt(userId));
+			List<OlaCircle> deployList = circleService.getDeployPostList(userId);
+			jsonObj.put("id", user.getId());
+			jsonObj.put("name", user.getName());
+			jsonObj.put("avator", user.getAvator());
+			jsonObj.put("sign", user.getSign());
+			JSONArray deployArray = new JSONArray();
+			for(OlaCircle circle:deployList){
+				JSONObject obj = JSONObject.fromObject(circle,circleJC);
+				obj.put("userName", user.getName());
+				obj.put("userAvatar", user.getAvator());
+				SimpleDateFormat sdf = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
+				obj.put("time", sdf.format(circle.getCreateTime()));
+				deployArray.add(obj);
+			}
+			jsonObj.put("deployList", deployArray);
+			JSONArray replyArray = new JSONArray();
+			List<OlaCircle> replyList = circleService.getReplyPostList(userId);
+			for(OlaCircle circle:replyList){
+				JSONObject obj = JSONObject.fromObject(circle,circleJC);
+				obj.put("userName", user.getName());
+				obj.put("userAvatar", user.getAvator());
+				SimpleDateFormat sdf = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
+				obj.put("time", sdf.format(circle.getCreateTime()));
+				replyArray.add(obj);
+			}
+			jsonObj.put("replyList", replyArray);
+			ret.put("result", jsonObj);
+			return ret;
 		} catch (Exception e) {
 			// TODO: handle exception
 			logger.error("", e);

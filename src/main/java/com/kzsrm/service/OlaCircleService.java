@@ -18,7 +18,19 @@ public interface OlaCircleService  extends BaseServiceMybatis<OlaCircle, String>
 	 * 欧拉圈列表
 	 * @return
 	 */
-	List<OlaCircle> getCircleList(String circleId, int pageCount,String type);
+	List<OlaCircle> getCircleList(String userId, String circleId, int pageCount,String type);
+	
+	/**
+	 * 所发贴列表
+	 * @return
+	 */
+	List<OlaCircle> getDeployPostList(String userId);
+	
+	/**
+	 * 所回答帖子列表
+	 * @return
+	 */
+	List<OlaCircle> getReplyPostList(String userId);
 	
 	/**
 	 * 对帖子点赞

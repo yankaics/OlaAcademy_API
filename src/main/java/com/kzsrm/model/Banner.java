@@ -12,7 +12,7 @@ public class Banner {
     
     private String url;
     
-    private int objectId;
+    private String objectId;
     
 	public int getId() {
 		return id;
@@ -54,11 +54,11 @@ public class Banner {
 		this.url = url;
 	}
 
-	public int getObjectId() {
+	public String getObjectId() {
 		return objectId;
 	}
 
-	public void setObjectId(int objectId) {
+	public void setObjectId(String objectId) {
 		this.objectId = objectId;
 	}
 

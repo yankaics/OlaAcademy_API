@@ -85,7 +85,7 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.2.7");
+		jsonObj.put("version", "1.2.8");
 		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kzsrm.model.CirclePraiseMapper" >
+  <resultMap id="BaseResultMap" type="com.kzsrm.model.CirclePraise" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="circleId" property="circleId" jdbcType="VARCHAR" />
+    <result column="isRead" property="isRead" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, userId, circleId,isRead, createTime
+  </sql>
+  
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from circlepraise
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getByParams" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+    from circlepraise
+    <where>
+    	<if test="userId != null and userId != ''">
+    		userId = #{userId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="circleId != null and circleId != ''">
+    		and circleId = #{circleId,jdbcType=VARCHAR}
+    	</if>
+    </where>
+  </select>
+  
+  <!-- 点赞列表 -->
+  <select id="getPraiseList" resultMap="BaseResultMap" parameterType="map" >
+    select
+	<include refid="Base_Column_List" />
+	from (select c.*,o.userId as deployerId from `circlepraise` c left join olacircle o on c.circleId = o.id) t 
+	where t.deployerId = #{userId,jdbcType=INTEGER} and t.userId != #{userId,jdbcType=INTEGER}  
+	and createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
+	order by createTime desc limit #{pageSize,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 未查看的点赞数 -->
+  <select id="getPraiseCount" resultType="java.lang.Integer" parameterType="map" >
+    select
+	count(*)
+	from (select c.*,o.userId as deployerId from `circlepraise` c left join olacircle o on c.circleId = o.id) t 
+	where t.deployerId = #{userId,jdbcType=INTEGER} and t.userId != #{userId,jdbcType=INTEGER}  
+	and isRead = 0
+  </select>
+  
+  <!-- 更新自己所发贴的点赞已读状态 -->
+  <update id="updatePraiseState" parameterType="map" >
+    update circlepraise c, olacircle o
+    <set>
+      isRead = 1 
+    </set>
+    where c.circleId = o.id 
+    and c.circleId = #{circleId,jdbcType=VARCHAR} 
+    and o.userId = #{userId,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer" >
+    delete from circlepraise
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.kzsrm.model.CirclePraise" >
+    insert into circlepraise (id, userId,circleId,isRead,createTime)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{circleId,jdbcType=VARCHAR},
+    #{isRead,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.kzsrm.model.OlaCircle" >
+    update olacircle
+    <set >
+      <if test="videoId != null" >
+        vid = #{videoId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        userid = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="courseId != null" >
+        courseId = #{courseId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateById" parameterType="com.kzsrm.model.OlaCircle" >
+    update olacircle
+    <set >
+      <if test="praiseNumber != null" >
+        praiseNumber = #{praiseNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

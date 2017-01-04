@@ -14,7 +14,10 @@ public class OlaCircle {
 	private Integer videoId;
 	private Integer praiseNumber;
 	private Integer readNumber;
+	private Integer commentNumber;
 	private Integer type;
+	private String assignUser; //指定回答用户ID
+	private Integer isPublic; // 是否公开
 	private Date createTime;
 	public Integer getId() {
 		return id;
@@ -76,12 +79,29 @@ public class OlaCircle {
 	public void setReadNumber(Integer readNumber) {
 		this.readNumber = readNumber;
 	}
-	
+	public Integer getCommentNumber() {
+		return commentNumber;
+	}
+	public void setCommentNumber(Integer commentNumber) {
+		this.commentNumber = commentNumber;
+	}
 	public Integer getType() {
 		return type;
 	}
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	public String getAssignUser() {
+		return assignUser;
+	}
+	public void setAssignUser(String assignUser) {
+		this.assignUser = assignUser;
+	}
+	public Integer getIsPublic() {
+		return isPublic;
+	}
+	public void setIsPublic(Integer isPublic) {
+		this.isPublic = isPublic;
 	}
 	public Date getCreateTime() {
 		return createTime;

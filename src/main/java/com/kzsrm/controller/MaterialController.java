@@ -10,6 +10,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -41,12 +42,13 @@ public class MaterialController {
 	public Map<String, Object> getMaterialList(
 			@RequestParam(required = false) String userId,
 			@RequestParam(required = false) String materialId,
+			@RequestParam(required = false) String materailId,  //前端拼写错误
 			@RequestParam(required = true) String type,
 			@RequestParam(defaultValue = "20") int pageSize) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
 			List<Material> materialList = materialService.getMaterialList(
-					materialId, type, pageSize);
+				TextUtils.isEmpty(materailId)?materialId:materailId, type, pageSize);
 			JSONArray materialArray = new JSONArray();
 			for (Material material : materialList) {
 				JSONObject jsonObj = JSONObject.fromObject(material, materialJC);

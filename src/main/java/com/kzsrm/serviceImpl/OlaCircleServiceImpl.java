@@ -45,7 +45,7 @@ public class OlaCircleServiceImpl extends BaseServiceMybatisImpl<OlaCircle, Stri
 	 * @return
 	 */
 	@Override
-	public List<OlaCircle> getCircleList(String circleId, int pageCount,String type){
+	public List<OlaCircle> getCircleList(String userId, String circleId, int pageCount,String type){
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(!StringUtils.isEmpty(circleId)){
 			OlaCircle videoLog = circleDao.getById(circleId);
@@ -62,7 +62,33 @@ public class OlaCircleServiceImpl extends BaseServiceMybatisImpl<OlaCircle, Stri
 		if(!TextUtils.isEmpty(type)){
 			map.put("type", type);
 		}
+		if(!TextUtils.isEmpty(userId)){
+			map.put("userId", userId);
+		}
 		return circleDao.getVideoList(map);
+	}
+	
+	/**
+	 * 所发贴列表
+	 * @return
+	 */
+	@Override
+	public List<OlaCircle> getDeployPostList(String userId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("type", "2");
+		map.put("userId", userId);
+		return circleDao.getDeployPost(map);
+	}
+	
+	/**
+	 * 所回答帖子列表
+	 * @return
+	 */
+	@Override
+	public List<OlaCircle> getReplyPostList(String userId){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userId", userId);
+		return circleDao.getReplyPost(map);
 	}
 	
 	/**

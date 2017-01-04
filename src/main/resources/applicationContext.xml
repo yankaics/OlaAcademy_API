@@ -67,6 +67,7 @@
 				<value>classpath:/com/kzsrm/model/VideoMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/VideoLogMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/OlaCircleMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/CirclePraiseMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/AttentionShipMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/CommentMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/KeywordMapper.xml</value>

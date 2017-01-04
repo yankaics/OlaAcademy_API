@@ -7,7 +7,7 @@
     <result column="pic" property="pic" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="url" property="url" jdbcType="VARCHAR" />
-    <result column="objectId" property="objectId" jdbcType="INTEGER" />
+    <result column="objectId" property="objectId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, name, pic, type, url, objectId

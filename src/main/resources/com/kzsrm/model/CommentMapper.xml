@@ -7,13 +7,18 @@
     <result column="postId" property="postId" jdbcType="INTEGER" />
     <result column="toUserId" property="toUserId" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="imageIds" property="imageIds" jdbcType="VARCHAR" />
+    <result column="videoUrls" property="videoUrls" jdbcType="VARCHAR" />
+    <result column="videoImgs" property="videoImgs" jdbcType="VARCHAR" />
+    <result column="audioUrls" property="audioUrls" jdbcType="VARCHAR" />
     <result column="location" property="location" jdbcType="VARCHAR" />
     <result column="praiseNumber" property="praiseNumber" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="isRead" property="isRead" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, userId, postId, toUserId,content, location, praiseNumber, type, createTime
+    id, userId, postId, toUserId,content, location, imageIds, videoUrls, videoImgs, audioUrls, praiseNumber,isRead,type, createTime
   </sql>
   
   <select id="getCommentList" resultMap="BaseResultMap" parameterType="map" >
@@ -23,6 +28,55 @@
 	where postId = #{postId,jdbcType=INTEGER}
 	and type = #{type,jdbcType=INTEGER}
 	order by createTime desc
+  </select>
+  
+  <!-- 评论消息 -->
+  <select id="getMessageList" resultMap="BaseResultMap" parameterType="map" >
+    select
+	<include refid="Base_Column_List" />
+	from (select c.*,o.userId as deployerId from `comment` c left join olacircle o on c.postId = o.id) t 
+	where (t.deployerId = #{userId,jdbcType=INTEGER} and t.userId != #{userId,jdbcType=INTEGER} or t.toUserId = #{userId,jdbcType=INTEGER})
+	and t.type = #{type,jdbcType=INTEGER}
+	and t.createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
+	order by t.createTime desc limit #{pageSize,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 未读评论消息数 -->
+  <select id="getUnreadMessageCount" resultType="java.lang.Integer" parameterType="map" >
+    select
+	count(*) 
+	from (select c.*,o.userId as deployerId from `comment` c left join olacircle o on c.postId = o.id) t 
+	where (t.deployerId = #{userId,jdbcType=INTEGER} and t.userId != #{userId,jdbcType=INTEGER} or t.toUserId = #{userId,jdbcType=INTEGER}) 
+	and type = #{type,jdbcType=INTEGER} and isRead = 0
+  </select>
+  
+  <!-- 更新自己所发贴的阅读状态 -->
+  <update id="updateReadState" parameterType="map" >
+    update comment
+    <set>
+      isRead = 1 
+    </set>
+    where postId = #{postId,jdbcType=VARCHAR} 
+    and (toUserId='' or toUserId=#{userId,jdbcType=VARCHAR}) 
+  </update>
+  
+  <!-- 更新他人所发贴的阅读状态 -->
+  <update id="updateOtherReadState" parameterType="map" >
+    update comment
+    <set>
+      isRead = 1 
+    </set>
+    where postId = #{postId,jdbcType=VARCHAR} 
+    and toUserId=#{userId,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 该帖中针对某人的回帖数 -->
+  <select id="getSubCommentCount" resultType="java.lang.Integer" parameterType="map" >
+    select
+	count(*) 
+	from comment 
+	where postId = #{postId,jdbcType=VARCHAR} 
+    and toUserId=#{userId,jdbcType=VARCHAR}
   </select>
   
   <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -36,10 +90,11 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kzsrm.model.Comment" >
-    insert into comment (id, userId,postId,toUserId,content,location,type,createTime)
+    insert into comment (id, userId,postId,toUserId,content,imageIds,videoUrls,videoImgs,audioUrls,location,type,createTime)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{postId,jdbcType=INTEGER},
-    #{toUserId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR},  
-    #{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+    #{toUserId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{imageIds,jdbcType=VARCHAR}, 
+    #{videoUrls,jdbcType=VARCHAR}, #{videoImgs,jdbcType=VARCHAR},#{audioUrls,jdbcType=VARCHAR},  
+    #{location,jdbcType=VARCHAR},#{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.kzsrm.model.Comment" >
     insert into comment

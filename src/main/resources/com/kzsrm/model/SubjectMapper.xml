@@ -60,7 +60,7 @@
     select
     <include refid="Base_Column_List" />
 	from subjectExamLog sl ,exam_subject es, `subject` t
-	where sl.sid = es.eid and t.id = sl.sid
+	where sl.sid = es.sid and t.id = sl.sid
 		and sl.isright ='0'
 		and sl.userid =#{userId,jdbcType=VARCHAR}
 		and es.eid = #{examId,jdbcType=INTEGER}

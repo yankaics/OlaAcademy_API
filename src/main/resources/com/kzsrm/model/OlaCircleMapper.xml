@@ -12,12 +12,43 @@
     <result column="videoId" property="videoId" jdbcType="INTEGER" />
     <result column="praiseNumber" property="praiseNumber" jdbcType="INTEGER" />
     <result column="readNumber" property="readNumber" jdbcType="INTEGER" />
+    <result column="commentNumber" property="commentNumber" jdbcType="INTEGER" />
+    <result column="assignUser" property="assignUser" jdbcType="VARCHAR" />
+    <result column="isPublic" property="isPublic" jdbcType="INTEGER" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, userId, title, content, imageGids, location, courseId, videoId, praiseNumber, readNumber, type, createTime
+    id, userId, title, content, imageGids, location, courseId, videoId, praiseNumber, readNumber,commentNumber,assignUser, isPublic, type, createTime
   </sql>
+  
+  <!-- 发布的贴 -->
+  <select id="getDeployPost" resultMap="BaseResultMap" parameterType="map" >
+    select
+	<include refid="Base_Column_List" />
+	from olacircle 
+	<where>
+    	<if test="type != null">
+		and type = #{type,jdbcType=INTEGER}
+    </if>
+    <if test="userId != null">
+        and userId = #{userId,jdbcType=VARCHAR}
+    </if>
+    order by createTime desc
+    </where>
+  </select>
+  
+  <!-- 回答的贴 -->
+  <select id="getReplyPost" resultMap="BaseResultMap" parameterType="map" >
+    select
+	o.*
+	from olacircle o,comment c 
+	where o.id = c.postId 
+    <if test="userId != null">
+        and c.userId = #{userId,jdbcType=VARCHAR} and o.userId != #{userId,jdbcType=VARCHAR} 
+    </if>
+    group by c.postId order by createTime desc
+  </select>
   
   <select id="getCircleList" resultMap="BaseResultMap" parameterType="map" >
     select
@@ -26,6 +57,12 @@
 	where createTime &lt; #{createTime,jdbcType=TIMESTAMP} 
 	<if test="type != null">
 		and type = #{type,jdbcType=INTEGER}
+    </if>
+    <if test="userId == null">
+        and isPublic = 1 
+    </if>
+    <if test="userId != null">
+        and (isPublic = 1 or (isPublic = 0 and (userId = #{userId,jdbcType=VARCHAR} or assignUser = #{userId,jdbcType=VARCHAR}) ))
     </if>
 	order by createTime desc limit #{pageCount,jdbcType=INTEGER}
   </select>
@@ -49,10 +86,11 @@
   </select>
   <insert id="insert" parameterType="com.kzsrm.model.OlaCircle" >
     insert into olacircle (id, userId,title,content,imageGids,location, videoId,
-      courseId, type, createTime)
+      courseId, assignUser, isPublic, type, createTime)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
     #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{imageGids,jdbcType=VARCHAR},#{location,jdbcType=VARCHAR},  
-     #{videoId,jdbcType=INTEGER},  #{courseId,jdbcType=INTEGER},#{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+     #{videoId,jdbcType=INTEGER},  #{courseId,jdbcType=INTEGER},#{assignUser,jdbcType=VARCHAR},#{isPublic,jdbcType=INTEGER},
+     #{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.kzsrm.model.OlaCircle" >
     insert into olacircle

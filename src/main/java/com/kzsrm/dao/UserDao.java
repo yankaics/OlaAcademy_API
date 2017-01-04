@@ -84,4 +84,9 @@ public class UserDao<E> extends BaseMybatisDao<User, Integer> {
 	public List<User> getListByGroup(Map<String, Object> param) {
 		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getByGroupId", param);
 	}
+	
+	public List<User> getUserList(Map<String, Object> param) {
+		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getUserList", param);
+	}
+	
 }

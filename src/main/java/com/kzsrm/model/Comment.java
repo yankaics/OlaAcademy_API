@@ -9,9 +9,14 @@ public class Comment {
 	private int type; // 1 针对course的评论 2针对帖子的评论 
 	private String toUserId; //被回复人Id
 	private String content;
+	private String imageIds;
+	private String videoUrls;
+	private String videoImgs;
+	private String audioUrls;
 	private String location;
 	private Date createTime;
 	private int praiseNumber;
+	private int isRead;
 	public int getId() {
 		return id;
 	}
@@ -48,6 +53,30 @@ public class Comment {
 	public void setContent(String content) {
 		this.content = content;
 	}
+	public String getImageIds() {
+		return imageIds;
+	}
+	public void setImageIds(String imageIds) {
+		this.imageIds = imageIds;
+	}
+	public String getVideoUrls() {
+		return videoUrls;
+	}
+	public void setVideoUrls(String videoUrls) {
+		this.videoUrls = videoUrls;
+	}
+	public String getVideoImgs() {
+		return videoImgs;
+	}
+	public void setVideoImgs(String videoImgs) {
+		this.videoImgs = videoImgs;
+	}
+	public String getAudioUrls() {
+		return audioUrls;
+	}
+	public void setAudioUrls(String audioUrls) {
+		this.audioUrls = audioUrls;
+	}
 	public String getLocation() {
 		return location;
 	}
@@ -66,5 +95,10 @@ public class Comment {
 	public void setPraiseNumber(int praiseNumber) {
 		this.praiseNumber = praiseNumber;
 	}
-
+	public int getIsRead() {
+		return isRead;
+	}
+	public void setIsRead(int isRead) {
+		this.isRead = isRead;
+	}
 }

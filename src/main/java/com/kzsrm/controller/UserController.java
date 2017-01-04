@@ -6,11 +6,15 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JsonConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,7 @@ import com.kzsrm.model.Yzm;
 import com.kzsrm.service.CoinHistoryService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ApiCode;
+import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.ConfigUtil;
 import com.kzsrm.utils.DateUtil;
 import com.kzsrm.utils.JavaSmsApi;
@@ -43,6 +48,7 @@ import com.kzsrm.utils.Tools;
 @Controller
 @RequestMapping("/user")
 public class UserController extends SimpleFormController {
+	
 	@Resource
 	private UserService userService;
 	@Resource
@@ -261,6 +267,34 @@ public class UserController extends SimpleFormController {
 			jsonObj.put("isActive", user.getIsActive());
 			jsonObj.put("vipTime", DateUtil.getDifferSec(new Date(), user.getVipTime())>0?DateUtil.getDifferSec(new Date(), user.getVipTime()):0);
 			result.put("data", jsonObj);
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+		return result;
+	}
+	
+	/**
+	 * 老师列表
+	 */
+	@RequestMapping(value = "/getTeacherList")
+	@ResponseBody
+	public Map<String, Object> getTeacherList() {
+		Map<String, Object> result = MapResult.initMap();
+		try {
+			List<User> userList = userService.getTeacherList();
+			JSONArray userArray = new JSONArray();
+			for(User user:userList){
+				net.sf.json.JSONObject userObj = new net.sf.json.JSONObject();
+				userObj.put("id", user.getId());
+				userObj.put("avator", user.getAvator());
+				userObj.put("name", user.getName());
+				userObj.put("sign",user.getSign());
+				userObj.put("local", user.getLocal());
+				userObj.put("phone", user.getPhone());
+				userArray.add(userObj);
+			}
+			result.put("result", userArray);
 		} catch (Exception e) {
 			logger.error("", e);
 			return MapResult.failMap();

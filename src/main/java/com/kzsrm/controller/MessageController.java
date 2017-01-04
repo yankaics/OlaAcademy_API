@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kzsrm.model.Course;
 import com.kzsrm.model.Message;
 import com.kzsrm.model.User;
+import com.kzsrm.service.CirclePraiseService;
+import com.kzsrm.service.CommentService;
 import com.kzsrm.service.CourseService;
 import com.kzsrm.service.MessageRecordService;
 import com.kzsrm.service.MessageService;
@@ -44,6 +46,10 @@ public class MessageController {
 	private MessageService messageService;
 	@Resource
 	private MessageRecordService recordService;
+	@Resource
+	private CommentService commentService;
+	@Resource
+	private CirclePraiseService praiseService;
 
 	/**
 	 * 消息列表
@@ -109,7 +115,7 @@ public class MessageController {
 	}
 	
 	/**
-	 * 未读消息数
+	 * 未读消息数（老版本）
 	 * 
 	 * @return
 	 */
@@ -121,6 +127,31 @@ public class MessageController {
 			Map<String, Object> ret = MapResult.initMap();
 			List<Message> messageList = messageService.getUnreadMessageList(userId);
 			ret.put("result", messageList.size());
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 未读消息数
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getUnreadTotalCount")
+	public Map<String, Object> getUnreadTotalCount(
+			@RequestParam(required = true) int userId) {
+		try {
+			Map<String, Object> ret = MapResult.initMap();
+			List<Message> messageList = messageService.getUnreadMessageList(userId);
+			Integer circleCount = commentService.getUnreadMessageCount(userId, 2);
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("systemCount",  messageList.size());
+			jsonObj.put("circleCount", circleCount);
+			jsonObj.put("praiseCount", praiseService.getPraiseCount(userId));
+			ret.put("result", jsonObj);
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);

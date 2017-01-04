@@ -87,6 +87,15 @@
 			</if>
     </where>
   	</select>
+  	
+  	<!-- 老师列表 -->
+  	<select id="getUserList" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    <include refid="Base_Column_List" />
+		from user
+		where isActive =
+		#{type,jdbcType=VARCHAR}
+  	</select>
 
 	<!-- 根据id删除用户 -->
 	<delete id="deleteById" parameterType="java.lang.Integer">

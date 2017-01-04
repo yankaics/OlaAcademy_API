@@ -86,6 +86,7 @@ public class VideoServiceImpl extends BaseServiceMybatisImpl<Video, String>
 				OlaCircle circle = new OlaCircle();
 				circle.setUserId(Integer.parseInt(userId));
 				circle.setCourseId(Integer.parseInt(pointId));
+				circle.setIsPublic(1);
 				circle.setType(1);
 				circle.setCreateTime(new Date());
 				if(videoList.size()>0){

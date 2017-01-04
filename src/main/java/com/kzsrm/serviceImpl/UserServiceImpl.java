@@ -143,4 +143,16 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 		}
 		return userDao.getListByGroup(params);
 	}
+	
+	/**
+	 * 老师列表
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<User> getTeacherList(){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("type", "2");
+		return userDao.getUserList(params);
+	}
 }

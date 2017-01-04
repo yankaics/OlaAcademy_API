@@ -39,4 +39,11 @@ public interface UserService {
 	 */
 	List<User> getGroupMember(String groupId,int pageIndex, int pageSize);
 	
+	/**
+	 * 老师列表
+	 * 
+	 * @return
+	 */
+	List<User> getTeacherList();
+	
 }
