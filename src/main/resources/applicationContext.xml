@@ -12,8 +12,8 @@
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
 	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd "
 	default-lazy-init="true">
-
-	<!-- 定义易受环境影响的变量 -->
+	
+	<!-- 配置文件 -->
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
@@ -100,43 +100,39 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-
+	
+	
 	<!-- jedis 配置 -->
-	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
-		<property name="maxIdle" value="${redis.maxIdle}" />
-		<property name="maxWaitMillis" value="${redis.maxWait}" />
-		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
-	</bean>
-	<!-- redis服务器中心 -->
-	<bean id="connectionFactory"
-		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-		<property name="poolConfig" ref="poolConfig" />
-		<property name="port" value="${redis.port}" />
-		<property name="hostName" value="${redis.host}" />
-		<property name="password" value="${redis.password}" />
-		<property name="timeout" value="${redis.timeout}"></property>
-	</bean>
-	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-		<property name="connectionFactory" ref="connectionFactory" />
-		<property name="keySerializer">
-			<bean
-				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-		</property>
-		<property name="valueSerializer">
-			<bean
-				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
-		</property>
-	</bean>
-
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig" >
+          <property name="maxIdle" value="${redis.maxIdle}" />
+          <property name="maxWaitMillis" value="${redis.maxWait}" />
+          <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean >
+    
+    <!-- redis服务器中心 -->
+    <bean id="connectionFactory"  class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" >
+          <property name="poolConfig" ref="poolConfig" />
+          <property name="port" value="${redis.port}" />
+          <property name="hostName" value="${redis.host}" />
+          <property name="password" value="${redis.password}" />
+          <property name="timeout" value="${redis.timeout}" ></property>
+    </bean >
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" >
+          <property name="connectionFactory" ref="connectionFactory" />
+          <property name="enableTransactionSupport" value="true" />
+          <property name="keySerializer" >
+              <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+          </property>
+          <property name="valueSerializer" >
+              <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+          </property>
+    </bean >
+    
 	<!-- cache配置 -->
-	<bean id="methodCacheInterceptor" class="com.kzsrm.utils.MethodCacheInterceptor">
-		<property name="redisUtil" ref="redisUtil" />
-	</bean>
-	<bean id="redisUtil" class="com.kzsrm.utils.RedisUtil">
-		<property name="redisTemplate" ref="redisTemplate" />
-	</bean>
-
+    <bean id="methodCacheInterceptor" class="com.kzsrm.interceptor.MethodCacheInterceptor" >
+          <property name="redisTemplate" ref="redisTemplate" />
+    </bean >
+    
 	<!-- 需要加入缓存的类或方法 -->
 	<bean id="methodCachePointCut"
 		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
@@ -146,12 +142,13 @@
 		<property name="patterns">
 			<list>
 				<!-- 确定正则表达式列表 -->
-				<!-- <value>com\.kzsrm\.serviceImpl\...*ServiceImpl.*</value> -->
+				<value>.*ServiceImpl.*</value>
 			</list>
 		</property>
 	</bean>
-
-
+  	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+	
+	<!-- 定时器 -->
 	<bean id="myTimer" class="com.kzsrm.controller.UserController"></bean>
 	<bean id="timeDitail"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -175,8 +172,6 @@
 			</list>
 		</property>
 	</bean>
-
-
 
 
 	<!-- 使用annotation定义事务 -->

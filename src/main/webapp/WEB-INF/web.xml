@@ -49,14 +49,10 @@
 	</filter-mapping>
 
 
-
-
-
-
 	<!-- 登录过滤器 -->
 	<!-- <filter>
 		<filter-name>sessionFilter</filter-name>
-		<filter-class>com.tt.comm.LoginInterceptor</filter-class>
+		<filter-class>com.kzsrm.interceptor.LoginInterceptor</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>sessionFilter</filter-name>
