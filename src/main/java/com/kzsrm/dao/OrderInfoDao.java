@@ -52,6 +52,13 @@ public class OrderInfoDao<E> extends BaseMybatisDao<OrderInfo, String> {
 				this.getMybatisMapperNamesapce() + ".getByUserAndStatus", map);
 	}
 	
+	public Integer getBuyGoodsNum(int userId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userId", userId);
+		return this.getSqlSession().selectOne(
+				this.getMybatisMapperNamesapce() + ".getBuyGoodsNum", map);
+	}
+	
 	public int updateOrderInfo(OrderInfo orderInfo) {
 		return this.getSqlSession().update(
 				this.getMybatisMapperNamesapce() + ".updateByPrimaryKeySelective", orderInfo);

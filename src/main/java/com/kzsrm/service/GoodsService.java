@@ -23,6 +23,13 @@ public interface GoodsService  extends BaseServiceMybatis<Goods, String> {
 	List<Goods> getBuyList(int userId,int status);
 	
 	/**
+	 * 获取已购商品个数
+	 * 
+	 * @return
+	 */
+	Integer getBuyListNum(int userId);
+	
+	/**
 	 * 更新购买数量
 	 * 
 	 * @return

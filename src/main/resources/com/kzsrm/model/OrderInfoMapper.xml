@@ -42,6 +42,14 @@
     where userId = #{userId,jdbcType=INTEGER} 
     and status = #{status,jdbcType=INTEGER}
   </select>
+  <!-- 已够精品课的数量 -->
+  <select id="getBuyGoodsNum" resultType="java.lang.Integer" parameterType="map"  >
+    select 
+    count(*) 
+    from orderInfo 
+    where userId = #{userId,jdbcType=INTEGER} 
+    and status = 1 and goodsId is not null and goodsId != ''
+  </select>
   <delete id="deleteById" parameterType="java.lang.Integer" >
     delete from orderInfo
     where id = #{id,jdbcType=INTEGER}

@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kzsrm.model.CoinHistory;
+import com.kzsrm.model.Collection;
 import com.kzsrm.model.User;
 import com.kzsrm.service.CoinHistoryService;
+import com.kzsrm.service.CollectionService;
+import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.MapResult;
 
@@ -33,6 +36,10 @@ public class DailyActController {
 	private CoinHistoryService dailyService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private GoodsService goodsService;
+	@Resource
+	private CollectionService collectionService;
 
 	/**
 	 * 获取当天签到状态
@@ -65,6 +72,9 @@ public class DailyActController {
 					todayCoin+=history.getDealNum();
 			}
 			jsonObj.put("todayCoin", todayCoin);
+			jsonObj.put("courseBuyNum", goodsService.getBuyListNum(userId));
+			List<Collection> collectionList = collectionService.getByUserId(userId);
+			jsonObj.put("courseCollectNum", collectionList.size());
 			ret.put("result", jsonObj);
 			return ret;
 		} catch (Exception e) {

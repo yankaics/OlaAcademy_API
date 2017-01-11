@@ -76,7 +76,7 @@
 	<!-- 获取群成员用户 -->
   	<select id="getByGroupId" resultMap="BaseResultMap" parameterType="map" >
     select 
-    u.id,u.name,u.avator,u.local,u.sign
+    u.id,u.name,u.avator,u.local,u.sign,u.examtype
     from user u,user_group ug
     <where>
     		ug.groupId = #{groupId,jdbcType=VARCHAR}

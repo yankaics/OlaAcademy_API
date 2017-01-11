@@ -69,6 +69,16 @@ public class GoodsServiceImpl extends BaseServiceMybatisImpl<Goods, String>
 		}
 		return goodsList;
 	}
+	
+	/**
+	 * 获取已购商品个数
+	 * 
+	 * @return
+	 */
+	@Override
+	public Integer getBuyListNum(int userId) {
+		return orderInfoDao.getBuyGoodsNum(userId);
+	}
 
 	/**
 	 * 更新购买数量
