@@ -262,6 +262,20 @@
 			<version>4.3.5</version>
 		</dependency>
 
+		<!-- aop -->
+		<dependency>
+			<groupId>aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.5.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.7.4</version>
+		</dependency>
+
+
 		<!-- spring定时器 -->
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -288,7 +302,7 @@
 			<version>1.0</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<finalName>kzsrm</finalName>
 		<resources>
