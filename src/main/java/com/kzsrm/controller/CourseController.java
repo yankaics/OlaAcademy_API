@@ -29,6 +29,7 @@ import com.kzsrm.model.Subject;
 import com.kzsrm.model.User;
 import com.kzsrm.model.Video;
 import com.kzsrm.model.VideoLog;
+import com.kzsrm.model.WatchRecord;
 import com.kzsrm.service.CollectionService;
 import com.kzsrm.service.CourseService;
 import com.kzsrm.service.ExamService;
@@ -40,6 +41,7 @@ import com.kzsrm.service.SubjectService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.service.VideoLogService;
 import com.kzsrm.service.VideoService;
+import com.kzsrm.service.WatchRecordService;
 import com.kzsrm.utils.ApiCode;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.DateUtil;
@@ -64,6 +66,7 @@ public class CourseController {
 	@Resource private UserService userService;
 	@Resource private CollectionService collectionService;
 	@Resource private HomeworkService homeworkService;
+	@Resource private WatchRecordService recordService;
 
 	/**
 	 * 课程列表-三层
@@ -336,11 +339,18 @@ public class CourseController {
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("pointId", pointId);
 			String isCollect = "0";
+			String playIndex = "0"; //上次播放的视频
+			String playProgress = "0";// 上次播放的位置
 			if(!StringUtils.isEmpty(userId)){
 				User user = userService.selectUser(Integer.parseInt(userId));
 				Collection c = collectionService.getByUserIdAndVideoId(user.getId(), Integer.parseInt(pointId),1);
 				if(c!=null){
 					isCollect = "1";
+				}
+				WatchRecord watchRecord = recordService.getUserWatchRecord(userId, "1", pointId);
+				if(watchRecord!=null){
+					playIndex = watchRecord.getCurrentIndex()+"";
+					playProgress = watchRecord.getCurrentTime();
 				}
 				for(int i=0;i< videoList.size();i++){
 					Video video = videoList.get(i);
@@ -350,7 +360,6 @@ public class CourseController {
 						}else{
 							video.setIsfree(0);
 						}
-						
 					}else{
 						video.setIsfree(1);
 					}
@@ -358,6 +367,8 @@ public class CourseController {
 				}
 			}
 			jsonObj.put("isCollect", isCollect);
+			jsonObj.put("playIndex", playIndex);
+			jsonObj.put("playProgress", playProgress);
 			jsonObj.put("videoList", videoList);
 			ret.put("result", jsonObj);
 			return ret;

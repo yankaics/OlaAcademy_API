@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kzsrm.model.Collection;
 import com.kzsrm.model.Goods;
 import com.kzsrm.model.Video;
+import com.kzsrm.model.WatchRecord;
 import com.kzsrm.service.CollectionService;
 import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.OrderInfoService;
 import com.kzsrm.service.VideoService;
+import com.kzsrm.service.WatchRecordService;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
 
@@ -36,6 +38,7 @@ public class GoodsController {
 	@Resource private VideoService videoService;
 	@Resource private OrderInfoService orderService;
 	@Resource private CollectionService collectionService;
+	@Resource private WatchRecordService recordService;
 
 	/**
 	 * 商品列表
@@ -110,18 +113,28 @@ public class GoodsController {
 		try{
 			Map<String, Object> ret = MapResult.initMap();
 			List<Video> videoList = videoService.getVideosByGoods(userId, gid);
-			// 购买状态
+			String isCollect = "0";
+			String orderStatus = "0";
+			String playIndex = "0"; //上次播放的视频
+			String playProgress = "0";// 上次播放的位置
 			if(!TextUtils.isEmpty(userId)){
-				ret.put("orderStatus", orderService.getOrderStatus(userId, gid));
-			}
-			if(!TextUtils.isEmpty(userId)){
-				String isCollect = "0";
+				// 收藏状态
 				Collection c = collectionService.getByUserIdAndVideoId(Integer.parseInt(userId), Integer.parseInt(gid),2);
 				if(c!=null){
 					isCollect = "1";
 				}
-				ret.put("isCollect", isCollect);
+				// 购买状态
+				orderStatus = orderService.getOrderStatus(userId, gid)+"";
+				WatchRecord watchRecord = recordService.getUserWatchRecord(userId, "2", gid);
+				if(watchRecord!=null){
+					playIndex = watchRecord.getCurrentIndex()+"";
+					playProgress = watchRecord.getCurrentTime();
+				}
 			}
+			ret.put("isCollect", isCollect);
+			ret.put("orderStatus", orderStatus);
+			ret.put("playIndex", playIndex);
+			ret.put("playProgress", playProgress);
 			ret.put("result", videoList);
 			return ret;
 		} catch (Exception e) {

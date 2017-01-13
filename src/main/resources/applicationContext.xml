@@ -92,6 +92,7 @@
 				<value>classpath:/com/kzsrm/model/CoinHistoryMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/ExchangeMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/MaterialMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/WatchRecordMapper.xml</value>
 			</list>
 		</property>
 	</bean>
