@@ -23,12 +23,10 @@ public class User {
 	private String qq;
 	private String local;
 	private Date regtime;
-	private Date logintime;
 	private String avator;
 	private String sign;
 	private String level;
 	private String honor;
-	private String learntime;
 	private String status;
 	private String examtype;
 	private String yzm;
@@ -36,6 +34,10 @@ public class User {
 	private String realName;
 	private String coin;
 	private Date vipTime;
+	private Date signIntime;  //上次签到时间
+	private String signIndays; // 连续签到天数
+	private String learntime;  //上次学习时间
+	private String learndays; // 累计学习天数 允许间断
 
 	public String getRealName() {
 		return realName;
@@ -67,14 +69,6 @@ public class User {
 
 	public void setHonor(String honor) {
 		this.honor = honor;
-	}
-
-	public String getLearntime() {
-		return learntime;
-	}
-
-	public void setLearntime(String learntime) {
-		this.learntime = learntime;
 	}
 
 	public String getExamtype() {
@@ -197,14 +191,6 @@ public class User {
 		this.regtime = regtime;
 	}
 
-	public Date getLogintime() {
-		return logintime;
-	}
-
-	public void setLogintime(Date logintime) {
-		this.logintime = logintime;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -228,13 +214,45 @@ public class User {
 	public void setVipTime(Date vipTime) {
 		this.vipTime = vipTime;
 	}
+	
+	public Date getSignIntime() {
+		return signIntime;
+	}
+
+	public void setSignIntime(Date signIntime) {
+		this.signIntime = signIntime;
+	}
+
+	public String getSignIndays() {
+		return signIndays;
+	}
+
+	public void setSignIndays(String signIndays) {
+		this.signIndays = signIndays;
+	}
+
+	public String getLearntime() {
+		return learntime;
+	}
+
+	public void setLearntime(String learntime) {
+		this.learntime = learntime;
+	}
+
+	public String getLearndays() {
+		return learndays;
+	}
+
+	public void setLearndays(String learndays) {
+		this.learndays = learndays;
+	}
 
 	@Override
 	public String toString() {
 		return "[id=" + id + ", name=" + name + ", sex=" + sex + ", age=" + age + ", phone=" + phone + ", passwd="
 				+ passwd + ", email=" + email + ", birthday=" + birthday + ", qq=" + qq + ", sign=" + sign
-				+ ", regtime=" + regtime + ", logintime=" + logintime + ", status=" + status + ", avator=" + avator
-				+ ", level=" + level + ", yzm=" + yzm + ", honor=" + honor + ", learntime=" + learntime + ", examtype="
+				+ ", regtime=" + regtime + ", signIntime=" + signIntime + ", status=" + status + ", avator=" + avator
+				+ ", level=" + level + ", yzm=" + yzm + ", honor=" + honor + ", signIndays=" + signIndays + ", examtype="
 				+ examtype + ", isActive="+isActive+",realName="+realName+",coin="+coin+"]";
 	}
 }

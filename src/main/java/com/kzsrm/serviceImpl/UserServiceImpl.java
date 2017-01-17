@@ -95,10 +95,6 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 		User u = this.userDao.userLogin(user);
 		map.put("data", u);
 		if (u != null) {
-			// 修改最后一次登录时间、
-			User useras = new User();
-			useras.setLogintime(new Date());
-			userDao.update(useras);
 			//如果首次登录，赠送5天会员
 			if(u.getVipTime()==null){
 //				Calendar c = Calendar.getInstance();

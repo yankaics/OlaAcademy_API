@@ -16,13 +16,15 @@
 		<result column="sign" jdbcType="VARCHAR" property="sign" />
 		<result column="regtime" jdbcType="DATE" property="regtime"
 			javaType="java.util.Date" />
-		<result column="logintime" jdbcType="DATE" property="logintime"
-			javaType="java.util.Date" />
 		<result column="status" jdbcType="VARCHAR" property="status" />
 		<result column="avator" jdbcType="VARCHAR" property="avator" />
 		<result column="level" jdbcType="VARCHAR" property="level" />
 		<result column="honor" jdbcType="VARCHAR" property="honor" />
-		<result column="learntime" jdbcType="VARCHAR" property="learntime" />
+		<result column="signIntime" jdbcType="DATE" property="signIntime"
+			javaType="java.util.Date" />
+		<result column="signIndays" jdbcType="VARCHAR" property="signIndays" />
+		<result column="learntime" jdbcType="VARCHAR" property="learntime"/>
+		<result column="learndays" jdbcType="VARCHAR" property="learndays" />
 		<result column="examtype" jdbcType="VARCHAR" property="examtype" />
 		<result column="vipTime" jdbcType="TIMESTAMP" property="vipTime" />
 		<result column="isActive" jdbcType="INTEGER" property="isActive" />
@@ -35,8 +37,8 @@
 		id, name, age, sex, phone, email, local,
 		birthday,sign,
 		regtime,qq,
-		logintime,isActive,realName,avator,sign,level,honor,learntime,isActive,realName,coin,
-		status,vipTime,examtype
+		signIntime,isActive,realName,avator,sign,level,honor,signIndays,isActive,realName,coin,
+		status,vipTime,examtype,learntime,learndays
 	</sql>
 
 	<select id="getUserBySessionId" parameterType="java.lang.Integer"
@@ -68,7 +70,7 @@
 	<!-- 根据手机号和邮箱查询用户信息 -->
 	<select id="selectUser" resultMap="BaseResultMap" parameterType="map">
 		select
-		id,name,sex,phone,passwd,email,birthday,qq,regtime,logintime,avator,sign,level,honor,learntime,status,examtype,local
+		id,name,sex,phone,passwd,email,birthday,qq,regtime,signIntime,avator,sign,level,honor,signIndays,learntime,learndays,status,examtype,local
 		from user
 		where phone = #{phone}
 	</select>
@@ -139,11 +141,17 @@
 			<if test="regtime != null">
 				regtime,
 			</if>
-			<if test="logintime != null">
-				logintime,
+			<if test="signIntime != null">
+				signIntime,
+			</if>
+			<if test="signIndays != null">
+				signIndays,
 			</if>
 			<if test="learntime != null">
 				learntime,
+			</if>
+			<if test="learndays != null">
+				learndays,
 			</if>
 			<if test="coin != null">
 				coin,
@@ -184,11 +192,17 @@
 			<if test="regtime != null">
 				#{regtime,jdbcType=TIMESTAMP},
 			</if>
-			<if test="logintime != null">
-				#{logintime,jdbcType=TIMESTAMP},
+			<if test="signIntime != null">
+				#{signIntime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="signIndays != null">
+				#{signIndays,jdbcType=VARCHAR},
 			</if>
 			<if test="learntime != null">
-				#{learntime,jdbcType=TIMESTAMP},
+				#{learntime,jdbcType=VARCHAR},
+			</if>
+			<if test="learndays != null">
+				#{learndays,jdbcType=VARCHAR},
 			</if>
 			<if test="coin != null">
 				#{coin,jdbcType=TIMESTAMP},
@@ -228,9 +242,6 @@
 			<if test="regtime != null">
 				regtime = #{regtime,jdbcType=TIMESTAMP},
 			</if>
-			<if test="logintime != null">
-				logintime = #{logintime,jdbcType=TIMESTAMP},
-			</if>
 			<if test="status != null">
 				status = #{status,jdbcType=VARCHAR},
 			</if>
@@ -252,8 +263,17 @@
 			<if test="honor != null">
 				honor = #{honor,jdbcType=VARCHAR},
 			</if>
+			<if test="signIntime != null">
+				signIntime = #{signIntime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="signIndays != null">
+				signIndays = #{signIndays,jdbcType=VARCHAR},
+			</if>
 			<if test="learntime != null">
-				learntime = #{learntime,jdbcType=VARCHAR},
+				learntime = #{learntime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="learndays != null">
+				learndays = #{learndays,jdbcType=VARCHAR},
 			</if>
 			<if test="examtype != null">
 				examtype = #{examtype,jdbcType=VARCHAR},

@@ -14,7 +14,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ import com.kzsrm.model.Yzm;
 import com.kzsrm.service.CoinHistoryService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ApiCode;
-import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.ConfigUtil;
 import com.kzsrm.utils.DateUtil;
 import com.kzsrm.utils.JavaSmsApi;
@@ -105,8 +103,8 @@ public class UserController extends SimpleFormController {
 						u.setRegtime(new Date());
 						u.setPasswd(MD5.md5(passwd));
 						u.setRegtime(new Date());
-						u.setLogintime(new Date());
-						u.setLearntime("1");
+						u.setSignIntime(new Date());
+						u.setSignIndays("1");
 						u.setCoin("20");
 						u.setStatus(status);
 						u.setIsActive(1);// 学生
@@ -261,7 +259,7 @@ public class UserController extends SimpleFormController {
 			jsonObj.put("age", user.getAge());
 			jsonObj.put("sex", user.getSex());
 			jsonObj.put("sign", user.getSign());
-			jsonObj.put("signInDays", user.getLearntime());
+			jsonObj.put("signInDays", user.getSignIndays());
 			jsonObj.put("coin", user.getCoin());
 			jsonObj.put("examtype", user.getExamtype());
 			jsonObj.put("isActive", user.getIsActive());
@@ -414,8 +412,8 @@ public class UserController extends SimpleFormController {
 							u.setName("小欧"+phone.substring(7, 11));
 							u.setRegtime(new Date());
 							u.setRegtime(new Date());
-							u.setLogintime(new Date());
-							u.setLearntime("1");
+							u.setSignIntime(new Date());
+							u.setSignIndays("1");
 							u.setCoin("20");
 							u.setIsActive(1);// 学生
 							Map<String, Object> maps = userService.insertUser(u);

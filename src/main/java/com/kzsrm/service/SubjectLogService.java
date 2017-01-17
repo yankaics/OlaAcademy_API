@@ -21,5 +21,12 @@ public interface SubjectLogService  extends BaseServiceMybatis<SubjectLog, Strin
 	 * @return
 	 */
 	void updateWrongSet(String userId,String subjectId, int type);
+	
+	/**
+	 * 用户所做题目数（课程 模考 作业）
+	 * @param userId
+	 * @return
+	 */
+	int getTotalFinishCount(String userId);
 
 }

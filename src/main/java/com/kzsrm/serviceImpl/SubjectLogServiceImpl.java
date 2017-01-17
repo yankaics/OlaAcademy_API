@@ -7,14 +7,19 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.http.util.TextUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kzsrm.baseservice.BaseServiceMybatisImpl;
+import com.kzsrm.dao.SubjectExamLogDao;
 import com.kzsrm.dao.SubjectLogDao;
+import com.kzsrm.dao.SubjectWorkLogDao;
 import com.kzsrm.model.Option;
 import com.kzsrm.model.Subject;
+import com.kzsrm.model.SubjectExamLog;
 import com.kzsrm.model.SubjectLog;
+import com.kzsrm.model.SubjectWorkLog;
 import com.kzsrm.mybatis.EntityDao;
 import com.kzsrm.service.SubjectLogService;
 
@@ -23,6 +28,10 @@ import com.kzsrm.service.SubjectLogService;
 public class SubjectLogServiceImpl extends BaseServiceMybatisImpl<SubjectLog, String> implements SubjectLogService {
 	@Resource
 	private SubjectLogDao<?> subjectLogDao;
+	@Resource
+	private SubjectExamLogDao<?> subjectExamLogDao;
+	@Resource
+	private SubjectWorkLogDao<?> subjectWorkLogDao;
 	
 	@Override
 	protected EntityDao<SubjectLog, String> getEntityDao() {
@@ -89,6 +98,24 @@ public class SubjectLogServiceImpl extends BaseServiceMybatisImpl<SubjectLog, St
 				subjectLogDao.deleteById(subjectLog.getId()+"");
 			}
 		}
+	}
+	
+	
+	/**
+	 * 用户所做题目数（课程 模考 作业）
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public int getTotalFinishCount(String userId) {
+		if(TextUtils.isEmpty(userId))
+			return 0;
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userid", userId);
+		List <SubjectLog> logList = subjectLogDao.getByParam(map);
+		List <SubjectExamLog> logExamList = subjectExamLogDao.getByParam(map);
+		List <SubjectWorkLog> logWorkList = subjectWorkLogDao.getByParam(map);
+		return logList.size()+logExamList.size()+logWorkList.size();
 	}
 	
 }

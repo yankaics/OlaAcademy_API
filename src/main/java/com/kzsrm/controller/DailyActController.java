@@ -54,13 +54,13 @@ public class DailyActController {
 			Map<String, Object> ret = MapResult.initMap();
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("status", dailyService.getCheckInStatus(userId));
-			Date lastSignIn = userService.selectUser(userId).getLogintime();
+			Date lastSignIn = userService.selectUser(userId).getSignIntime();
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			if(lastSignIn!=null){
 				jsonObj.put("lastSignIn", formatter.format(lastSignIn));
 			}
 			User u = userService.selectUser(userId);
-			jsonObj.put("signInDays", u.getLearntime());
+			jsonObj.put("signInDays", u.getSignIndays());
 			jsonObj.put("coin", u.getCoin());
 			jsonObj.put("profileTask", dailyService.validateFirstPay(userId, 8)==1?0:1);
 			jsonObj.put("vipTask", dailyService.validateFirstPay(userId, 4)==1?0:1);
@@ -104,7 +104,7 @@ public class DailyActController {
 			// 更改连续签到时间
 			if(act!=null){
 				User user = userService.selectUser(userId);
-				int continueDays = Integer.parseInt(user.getLearntime()); //连续签到
+				int continueDays = Integer.parseInt(user.getSignIndays()); //连续签到
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				Date date = formatter.parse(act.getDate());
 				long interval = new Date().getTime() - date.getTime();
@@ -113,8 +113,8 @@ public class DailyActController {
 				}else if(interval>172800000){
 					continueDays=1;
 				}
-				user.setLearntime(continueDays+""); //连续签到
-				user.setLogintime(new Date()); // 签到日期
+				user.setSignIndays(continueDays+""); //连续签到
+				user.setSignIntime(new Date()); // 签到日期
 				userService.updateUser(user);
 			}
 			if(status==0){
