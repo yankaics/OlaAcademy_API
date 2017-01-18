@@ -88,13 +88,11 @@ public class HomePageController {
 				questionArray.add(question);
 			}
 			if(TextUtils.isEmpty(userId)){
-				jsonObj.put("learnTime", "0");
 				jsonObj.put("studyDay", "1");
 				jsonObj.put("finishCount", "0");
-				jsonObj.put("defeatPercent", "0");
+				jsonObj.put("defeatPercent", "0%");
 			}else{
 				User u = userService.selectUser(Integer.parseInt(userId));
-				jsonObj.put("learnTime", "0");
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				String today = formatter.format(new Date());
 				if(!today.equals(u.getLearntime())){

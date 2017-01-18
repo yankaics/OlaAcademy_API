@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -62,6 +63,15 @@ public class PayController {
 	private GoodsService goodsService;
 	@Resource
 	private CoinHistoryService coinHistoryService;
+	
+	private static int monthPrice1 = 30;
+	private static int halfYearPrice1 = 158;
+	private static int yearPrice1 = 298;
+	
+	private static int monthPrice2 = 38;
+	private static int halfYearPrice2 = 198;
+	private static int yearPrice2 = 398;
+			
 	/**
 	 * 是否显示支付模块(苹果审核)
 	 * 
@@ -90,6 +100,23 @@ public class PayController {
 		ret.put("result", jsonObj);
 		return ret;
 	}
+	
+	/**
+	 * 会员价格
+	 * 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getVIPPrice")
+	public Map<String, Object> getVIPPrice() throws Exception {
+		Map<String, Object> ret = MapResult.initMap();
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("monthPrice", monthPrice2);
+		jsonObj.put("halfYearPrice", halfYearPrice2);
+		jsonObj.put("yearPrice", yearPrice2);
+		ret.put("result", jsonObj);
+		return ret;
+	}
 
 	/**
 	 * 支付宝订单信息
@@ -103,6 +130,7 @@ public class PayController {
 			@RequestParam(required = true) String userId,
 			@RequestParam(required = true) String type,
 			@RequestParam(required = true) String goodsId,
+			@RequestParam(required = false) String app_version,
 			@RequestParam(defaultValue="0") int coin) throws Exception {
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
@@ -119,9 +147,9 @@ public class PayController {
 			String price = "0.01";
 			String body = "欧拉会员";
 			if (type.equals("1")) { // 月度会员
-				price = "30";
+				price = (TextUtils.isEmpty(app_version)?monthPrice1:monthPrice2)+"";
 			} else if (type.equals("2")) { // 年度会员
-				price = "158";
+				price = (TextUtils.isEmpty(app_version)?halfYearPrice1:halfYearPrice2)+"";
 			} else if (type.equals("3")) { //精品课
 				float discountPrice = goodsService.getById(goodsId).getPrice();
 				if(coin>0){ //欧拉币兑换，最多抵10%
@@ -130,7 +158,7 @@ public class PayController {
 				price = discountPrice + "";
 				body = goodsService.getById(goodsId).getName();
 			}else if (type.equals("4")) { //年度会员
-				price = "298";
+				price = (TextUtils.isEmpty(app_version)?yearPrice1:yearPrice2)+"";
 			}
 
 			String orderInfo = AlipayCore.getOrderInfo(body, "订单号："
@@ -167,6 +195,7 @@ public class PayController {
 			@RequestParam(required = true) String userId,
 			@RequestParam(required = true) String type,
 			@RequestParam(required = true) String goodsId,
+			@RequestParam(required = false) String app_version,
 			@RequestParam(defaultValue="0") int coin) throws Exception {
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
@@ -190,10 +219,10 @@ public class PayController {
 		parameters.put("nonce_str", noncestr);
 		parameters.put("out_trade_no", out_trade_no);
 		if (type.equals("1")) { // 月度会员
-			parameters.put("total_fee", "3000");
+			parameters.put("total_fee", (TextUtils.isEmpty(app_version)?monthPrice1:monthPrice2)*100+"");
 			parameters.put("body", "欧拉会员");
 		} else if (type.equals("2")) { // 年度会员
-			parameters.put("total_fee", "15800");
+			parameters.put("total_fee", (TextUtils.isEmpty(app_version)?halfYearPrice1:halfYearPrice2)*100+"");
 			parameters.put("body", "欧拉会员");
 		} else if (type.equals("3")){
 			float discountPrice = goodsService.getById(goodsId).getPrice();
@@ -203,7 +232,7 @@ public class PayController {
 			parameters.put("total_fee", (int)(discountPrice * 100) + "");
 			parameters.put("body", goodsService.getById(goodsId).getName());
 		}else if (type.equals("4")) { //年度会员
-			parameters.put("total_fee", "29800");
+			parameters.put("total_fee", (TextUtils.isEmpty(app_version)?yearPrice1:yearPrice2)*100+"");
 			parameters.put("body", "欧拉会员");
 		}
 
