@@ -19,7 +19,9 @@
 	<include refid="Base_Column_List" /> 
 	from studygroup  
 	where createUser > 0
-	and type = #{type,jdbcType=INTEGER}
+	<if test="type != null" >
+        and type = #{type,jdbcType=INTEGER}
+    </if>
 	order by createTime desc
   </select>
   

@@ -55,7 +55,9 @@ public class GroupServiceImpl extends BaseServiceMybatisImpl<Group, String>
 	@Override
 	public List<Group> getUserGroupList(String type) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("type", type);
+		if(!type.equals("0")){
+			map.put("type", type);
+		}
 		return groupDao.getUserGroupList(map);
 	}
 
