@@ -108,6 +108,8 @@ public class HomePageController {
 				Random random=new java.util.Random();
 				jsonObj.put("defeatPercent", random.nextInt(70)+30+"%");
 			}
+			jsonObj.put("userId","381");
+			jsonObj.put("avator","78de30c6-2234-4ac0-af2d-0f0b5f792f91");
 			jsonObj.put("bannerList",bannerArray);
 			jsonObj.put("questionList",questionArray);
 			jsonObj.put("goodsList",goodsList);
