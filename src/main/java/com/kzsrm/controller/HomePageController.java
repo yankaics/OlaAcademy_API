@@ -91,8 +91,12 @@ public class HomePageController {
 				jsonObj.put("studyDay", "1");
 				jsonObj.put("finishCount", "0");
 				jsonObj.put("defeatPercent", "0%");
+				jsonObj.put("userId","381");
+				jsonObj.put("avator","default.jpg");
 			}else{
 				User u = userService.selectUser(Integer.parseInt(userId));
+				jsonObj.put("userId",userId);
+				jsonObj.put("avator",u.getAvator());
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				String today = formatter.format(new Date());
 				if(!today.equals(u.getLearntime())){
@@ -108,8 +112,6 @@ public class HomePageController {
 				Random random=new java.util.Random();
 				jsonObj.put("defeatPercent", random.nextInt(70)+30+"%");
 			}
-			jsonObj.put("userId","381");
-			jsonObj.put("avator","78de30c6-2234-4ac0-af2d-0f0b5f792f91");
 			jsonObj.put("bannerList",bannerArray);
 			jsonObj.put("questionList",questionArray);
 			jsonObj.put("goodsList",goodsList);

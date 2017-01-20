@@ -10,6 +10,8 @@ public class Course {
     private String profile;
 
     private String address;
+    
+    private String teacherId;
 
     private String pid;
     
@@ -63,7 +65,15 @@ public class Course {
         this.address = address == null ? null : address.trim();
     }
 
-    public String getPid() {
+    public String getTeacherId() {
+		return teacherId;
+	}
+
+	public void setTeacherId(String teacherId) {
+		this.teacherId = teacherId;
+	}
+
+	public String getPid() {
         return pid;
     }
 

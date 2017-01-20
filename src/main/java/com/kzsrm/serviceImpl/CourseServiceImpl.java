@@ -12,6 +12,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.util.TextUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,10 @@ import com.kzsrm.dao.CourseDao;
 import com.kzsrm.dao.OptionDao;
 import com.kzsrm.dao.SubjectDao;
 import com.kzsrm.dao.SubjectLogDao;
+import com.kzsrm.dao.TeacherDao;
 import com.kzsrm.model.Course;
 import com.kzsrm.model.Subject;
+import com.kzsrm.model.Teacher;
 import com.kzsrm.mybatis.EntityDao;
 import com.kzsrm.service.CourseService;
 import com.kzsrm.utils.ComUtils;
@@ -34,6 +37,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	@Resource private SubjectDao<?> subjectDao;
 	@Resource private SubjectLogDao<?> subjectLogDao;
 	@Resource private OptionDao<?> optionDao;
+	@Resource private TeacherDao<?> teacherDao;
 
 	@Override
 	protected EntityDao<Course, String> getEntityDao() {
@@ -126,6 +130,11 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 				JSONArray children = new JSONArray();
 				for (Course child : courseList){
 					JSONObject ch = getMultilevelCour(child, userid, type);
+					if(!TextUtils.isEmpty(ch.getString("teacherId"))){
+						Teacher teacher = teacherDao.getById(ch.getString("teacherId"));
+						ch.put("teacherName", teacher.getName());
+						ch.put("teacherAvator", teacher.getAvatar());
+					}
 					subNum += ch.getInt("subNum");
 					children.add(ch);
 				}

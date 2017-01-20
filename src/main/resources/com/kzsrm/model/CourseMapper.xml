@@ -7,6 +7,7 @@
     <result column="type" property="type" jdbcType="VARCHAR" />
     <result column="profile" property="profile" jdbcType="VARCHAR" />
     <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="teacherId" property="teacherId" jdbcType="VARCHAR" />
     <result column="pid" property="pid" jdbcType="VARCHAR" />
     <result column="playcount" property="playcount" jdbcType="INTEGER" />
     <result column="subAllNum" property="subAllNum" jdbcType="INTEGER" />
@@ -15,7 +16,7 @@
     <result column="bannerPic" property="bannerPic" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    t.id, t.type, t.name, t.profile, t.address, t.pid, t.playcount, t.subAllNum, t.totalTime, t.isBanner,t.bannerPic
+    t.id, t.type, t.name, t.profile, t.address, t.teacherId, t.pid, t.playcount, t.subAllNum, t.totalTime, t.isBanner,t.bannerPic
   </sql>
   <!-- 获取所有二级的课程 -->
   <select id="getSecLevelCour" resultMap="BaseResultMap" parameterType="java.lang.String" >
