@@ -46,4 +46,11 @@ public interface UserService {
 	 */
 	List<User> getTeacherList();
 	
+	/**
+	 * 用户综合排名（打败多少用户）
+	 * 
+	 * @return
+	 */
+	int getUesrDefeatPercent(String userId);
+	
 }

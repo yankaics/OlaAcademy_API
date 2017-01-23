@@ -25,6 +25,7 @@
 		<result column="signIndays" jdbcType="VARCHAR" property="signIndays" />
 		<result column="learntime" jdbcType="VARCHAR" property="learntime"/>
 		<result column="learndays" jdbcType="VARCHAR" property="learndays" />
+		<result column="answerNum" jdbcType="VARCHAR" property="answerNum" />
 		<result column="examtype" jdbcType="VARCHAR" property="examtype" />
 		<result column="vipTime" jdbcType="TIMESTAMP" property="vipTime" />
 		<result column="isActive" jdbcType="INTEGER" property="isActive" />
@@ -38,7 +39,7 @@
 		birthday,sign,
 		regtime,qq,
 		signIntime,isActive,realName,avator,sign,level,honor,signIndays,isActive,realName,coin,
-		status,vipTime,examtype,learntime,learndays
+		status,vipTime,examtype,learntime,learndays,answerNum
 	</sql>
 
 	<select id="getUserBySessionId" parameterType="java.lang.Integer"
@@ -70,9 +71,26 @@
 	<!-- 根据手机号和邮箱查询用户信息 -->
 	<select id="selectUser" resultMap="BaseResultMap" parameterType="map">
 		select
-		id,name,sex,phone,passwd,email,birthday,qq,regtime,signIntime,avator,sign,level,honor,signIndays,learntime,learndays,status,examtype,local
+		id,name,sex,phone,passwd,email,birthday,qq,regtime,signIntime,avator,sign,level,honor,signIndays,learntime,learndays,answerNum,status,examtype,local
 		from user
 		where phone = #{phone}
+	</select>
+	
+	<!-- 用户做题数排名 -->
+	<select id="getAnswerRank" parameterType="map" resultType="java.lang.Integer">
+		select (select count(1) from user where answerNum>= (select answerNum from user where id = #{userId,jdbcType=VARCHAR} order by answerNum desc limit 1)) as rank 
+		from user where id = #{userId,jdbcType=VARCHAR};
+	</select>
+	
+	<!-- 用户累计使用天数排名 -->
+	<select id="getLearnDaysRank" parameterType="map" resultType="java.lang.Integer">
+		select (select count(1) from user where learndays>= (select learndays from user where id = #{userId,jdbcType=VARCHAR} order by learndays desc limit 1)) as rank 
+		from user where id = #{userId,jdbcType=VARCHAR};
+	</select>
+	
+	<!-- 用户总数 -->
+	<select id="getUserNum" parameterType="map" resultType="java.lang.Integer">
+		select count(*) from user
 	</select>
 	
 	<!-- 获取群成员用户 -->
@@ -225,10 +243,7 @@
 			<if test="age != null and age!=''">
 				age = #{age,jdbcType=INTEGER},
 			</if>
-<!-- 			<if test="passwd != null">
-				passwd = #{passwd,jdbcType=VARCHAR},
-			</if>
- -->			<if test="sex != null">
+ 			<if test="sex != null">
 				sex = #{sex,jdbcType=VARCHAR},
 			</if>
 			<!-- <if test="phone != null"> phone = #{phone,jdbcType=VARCHAR}, </if> -->
@@ -274,6 +289,9 @@
 			</if>
 			<if test="learndays != null">
 				learndays = #{learndays,jdbcType=VARCHAR},
+			</if>
+			<if test="answerNum != null">
+				answerNum = #{answerNum,jdbcType=VARCHAR},
 			</if>
 			<if test="examtype != null">
 				examtype = #{examtype,jdbcType=VARCHAR},

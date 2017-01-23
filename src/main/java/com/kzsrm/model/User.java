@@ -38,6 +38,7 @@ public class User {
 	private String signIndays; // 连续签到天数
 	private String learntime;  //上次学习时间
 	private String learndays; // 累计学习天数 允许间断
+	private String answerNum; //已做题数
 
 	public String getRealName() {
 		return realName;
@@ -245,6 +246,14 @@ public class User {
 
 	public void setLearndays(String learndays) {
 		this.learndays = learndays;
+	}
+
+	public String getAnswerNum() {
+		return answerNum;
+	}
+
+	public void setAnswerNum(String answerNum) {
+		this.answerNum = answerNum;
 	}
 
 	@Override

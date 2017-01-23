@@ -89,4 +89,17 @@ public class UserDao<E> extends BaseMybatisDao<User, Integer> {
 		return this.getSqlSession().selectList(this.getMybatisMapperNamesapce() + ".getUserList", param);
 	}
 	
+	// 用户总数
+	public Integer getUserNum(Map<String, Object> param) {
+		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getUserNum", param);
+	}
+	// 做题数排名
+	public Integer getAnswerRank(Map<String, Object> param) {
+		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getAnswerRank", param);
+	}
+	// 累计学习数排名
+	public Integer getLearnDaysRank(Map<String, Object> param) {
+		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getLearnDaysRank", param);
+	}
+	
 }

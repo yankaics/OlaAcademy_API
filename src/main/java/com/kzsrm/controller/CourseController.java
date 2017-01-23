@@ -67,6 +67,7 @@ public class CourseController {
 	@Resource private CollectionService collectionService;
 	@Resource private HomeworkService homeworkService;
 	@Resource private WatchRecordService recordService;
+	@Resource private SubjectLogService subjectLogService;
 
 	/**
 	 * 课程列表-三层
@@ -417,7 +418,14 @@ public class CourseController {
 				return MapResult.initMap(ApiCode.PARG_ERR, "答案为空");
 			
 			Map<String, Object> ret = MapResult.initMap();
+			// 提交答案
 			JSONArray subList = subjectService.checkAnswer(userId, answer, type);
+			// 记录已做题书
+			if(!TextUtils.isEmpty(userId)){
+				User user = userService.selectUser(Integer.parseInt(userId));
+				user.setAnswerNum(subjectLogService.getTotalFinishCount(userId)+"");
+				userService.updateUser(user);
+			}
 			ret.put("result", subList);
 			return ret;
 		} catch (Exception e) {

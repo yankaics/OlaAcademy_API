@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.Resource;
 
@@ -29,7 +28,6 @@ import com.kzsrm.service.BannerService;
 import com.kzsrm.service.CourseService;
 import com.kzsrm.service.GoodsService;
 import com.kzsrm.service.OlaCircleService;
-import com.kzsrm.service.SubjectLogService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
@@ -52,8 +50,6 @@ public class HomePageController {
 	private CourseService courseService;
 	@Resource
 	private OlaCircleService circleService;
-	@Resource
-	private SubjectLogService subjectLogService;
 
 	
 	@ResponseBody
@@ -108,9 +104,8 @@ public class HomePageController {
 				}else{
 					jsonObj.put("studyDay", u.getLearndays());
 				}
-				jsonObj.put("finishCount", subjectLogService.getTotalFinishCount(userId));
-				Random random=new java.util.Random();
-				jsonObj.put("defeatPercent", random.nextInt(70)+30+"%");
+				jsonObj.put("finishCount", u.getAnswerNum());
+				jsonObj.put("defeatPercent", userService.getUesrDefeatPercent(userId)+"%");
 			}
 			jsonObj.put("bannerList",bannerArray);
 			jsonObj.put("questionList",questionArray);

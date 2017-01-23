@@ -151,4 +151,15 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 		params.put("type", "2");
 		return userDao.getUserList(params);
 	}
+
+	@Override
+	public int getUesrDefeatPercent(String userId) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		float userNum = userDao.getUserNum(params);
+		float answerRank = userDao.getAnswerRank(params)/userNum;
+		float learnRank = userDao.getLearnDaysRank(params)/userNum;
+		
+		return (int)((1-(answerRank+learnRank)/2.0)*100);
+	}
 }
