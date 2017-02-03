@@ -93,6 +93,7 @@
 				<value>classpath:/com/kzsrm/model/ExchangeMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/MaterialMapper.xml</value>
 				<value>classpath:/com/kzsrm/model/WatchRecordMapper.xml</value>
+				<value>classpath:/com/kzsrm/model/AuthInfoMapper.xml</value>
 			</list>
 		</property>
 	</bean>
