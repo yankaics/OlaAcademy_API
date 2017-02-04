@@ -10,6 +10,7 @@ public class AuthInfo {
 	private String phone; 
 	private String email; 
 	private String profile;
+	private String domain;
 	private int status; // 0 未认证 1 认证中 2 已认证 3 被驳回
 	private Date createTime;
 	
@@ -51,6 +52,12 @@ public class AuthInfo {
 	}
 	public int getStatus() {
 		return status;
+	}
+	public String getDomain() {
+		return domain;
+	}
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 	public void setStatus(int status) {
 		this.status = status;

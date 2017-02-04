@@ -13,7 +13,7 @@ public interface AuthInfoService extends BaseServiceMybatis<AuthInfo, String> {
 	/**
 	 * 提交认证信息
 	 */
-	void submitAuthInfo(String userId, String name, String phone, String email,String profile);
+	void submitAuthInfo(String userId, String name, String phone, String email,String profile,String domain);
 	
 	/**
 	 * 取消认证

@@ -8,11 +8,12 @@
     <result column="phone" property="phone" jdbcType="VARCHAR" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="profile" property="profile" jdbcType="VARCHAR" />
+    <result column="domain" property="domain" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, userId, name, phone, email, profile, status, createTime
+    id, userId, name, phone, email, profile, domain, status, createTime
   </sql>
   
   <select id="getByUserId" resultMap="BaseResultMap" parameterType="map" >
@@ -39,10 +40,10 @@
   </delete>
   
   <insert id="insert" parameterType="com.kzsrm.model.AuthInfo" >
-    insert into authinfo (id,userId,name,phone,profile,email,status,createTime)
+    insert into authinfo (id,userId,name,phone,profile,email,domain, status,createTime)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},#{name,jdbcType=VARCHAR}, 
     #{phone,jdbcType=VARCHAR},#{profile,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-     #{status,jdbcType=VARCHAR},  #{createTime,jdbcType=TIMESTAMP})
+    #{domain,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   
   <update id="updateById" parameterType="com.kzsrm.model.AuthInfo" >
@@ -62,6 +63,9 @@
       </if>
       <if test="email != null" >
         email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="domain != null" >
+        domain = #{domain,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},

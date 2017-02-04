@@ -19,6 +19,7 @@ import com.kzsrm.model.AuthInfo;
 import com.kzsrm.service.AuthInfoService;
 import com.kzsrm.utils.ComUtils;
 import com.kzsrm.utils.MapResult;
+import com.kzsrm.utils.SendMail;
 
 @Controller
 @RequestMapping("/auth")
@@ -45,13 +46,13 @@ public class AuthInfoController {
 			Map<String, Object> ret = MapResult.initMap();
 			AuthInfo authInfo = authService.queryAuthInfo(userId);
 			if(authInfo==null){
-				ret.put("authInfo", new AuthInfo());
+				ret.put("result", new AuthInfo());
 			}else{
 				JSONObject jsonObj = JSONObject.fromObject(authInfo, authJC);
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd HH:mm:ss");
 				jsonObj.put("createTime", sdf.format(authInfo.getCreateTime()));
-				ret.put("authInfo", jsonObj);
+				ret.put("result", jsonObj);
 			}
 			return ret;
 		} catch (Exception e) {
@@ -70,10 +71,12 @@ public class AuthInfoController {
 	public Map<String, Object> submitAuthInfo(
 			@RequestParam(required = true) String userId,@RequestParam(required = true) String name,
 			@RequestParam(required = true) String phone,@RequestParam(required = true) String email,
-			@RequestParam(required = true) String profile) {
+			@RequestParam(required = true) String domain,@RequestParam(required = true) String profile) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			authService.submitAuthInfo(userId, name, phone, email, profile);
+			authService.submitAuthInfo(userId, name, phone, email, profile,domain);
+			String mailInfo = "认证信息 手机号:"+phone+"\n 姓名："+name+"\n 邮箱："+email+"\n 所授课程："+domain;
+			SendMail.sendMail("renjincheng@126.com", "forevertxp@gmail.com", "", "老师认证信息", mailInfo);
 			return ret;
 		} catch (Exception e) {
 			logger.error("", e);

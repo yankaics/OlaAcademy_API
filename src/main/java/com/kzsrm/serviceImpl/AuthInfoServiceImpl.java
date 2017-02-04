@@ -36,7 +36,7 @@ public class AuthInfoServiceImpl extends BaseServiceMybatisImpl<AuthInfo, String
 	}
 
 	@Override
-	public void submitAuthInfo(String userId, String name, String phone, String email, String profile) {
+	public void submitAuthInfo(String userId, String name, String phone, String email, String profile,String domain) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("userId", userId);
@@ -46,6 +46,7 @@ public class AuthInfoServiceImpl extends BaseServiceMybatisImpl<AuthInfo, String
 			authInfo.setPhone(phone);
 			authInfo.setProfile(profile);
 			authInfo.setEmail(email);
+			authInfo.setDomain(domain);
 			authInfo.setStatus(1);
 			authInfo.setCreateTime(new Date());
 			authDao.update(authInfo);
@@ -56,6 +57,7 @@ public class AuthInfoServiceImpl extends BaseServiceMybatisImpl<AuthInfo, String
 			auth.setPhone(phone);
 			auth.setProfile(profile);
 			auth.setEmail(email);
+			auth.setDomain(domain);
 			auth.setStatus(1);
 			auth.setCreateTime(new Date());
 			authDao.save(auth);
