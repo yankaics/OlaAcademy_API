@@ -15,9 +15,10 @@ public interface CourseService  extends BaseServiceMybatis<Course, String> {
 	 * 查询pid下的所有子项
 	 * @param pid
 	 * @param type
+	 * @param orderType 排序类型
 	 * @return
 	 */
-	List<Course> getchildrenCour(String pid, String type);
+	List<Course> getchildrenCour(String pid, String type,String orderType);
 	
 	/**
 	 * 查询课程

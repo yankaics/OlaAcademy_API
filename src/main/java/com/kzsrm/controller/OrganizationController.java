@@ -212,7 +212,7 @@ public class OrganizationController {
 					}
 					switch (org.getId()) {
 					case 1:
-						SendMail.sendMail("myofficer@qq.com", "544541861@qq.com", "renjincheng@126.com", "欧拉学院报名信息", mailInfo);
+						SendMail.sendMail("myofficer@qq.com", "renjincheng@126.com", "151621577@qq.com", "欧拉学院报名信息", mailInfo);
 						break;
 					case 2:
 						SendMail.sendMail("2221650373@qq.com", "renjincheng@126.com", "contact@olaxueyuan.com", "欧拉学院报名信息", mailInfo);

@@ -26,6 +26,7 @@ import com.kzsrm.model.Examination;
 import com.kzsrm.model.Homework;
 import com.kzsrm.model.Option;
 import com.kzsrm.model.Subject;
+import com.kzsrm.model.Teacher;
 import com.kzsrm.model.User;
 import com.kzsrm.model.Video;
 import com.kzsrm.model.VideoLog;
@@ -38,6 +39,7 @@ import com.kzsrm.service.OptionService;
 import com.kzsrm.service.SubjectExamLogService;
 import com.kzsrm.service.SubjectLogService;
 import com.kzsrm.service.SubjectService;
+import com.kzsrm.service.TeacherService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.service.VideoLogService;
 import com.kzsrm.service.VideoService;
@@ -68,6 +70,7 @@ public class CourseController {
 	@Resource private HomeworkService homeworkService;
 	@Resource private WatchRecordService recordService;
 	@Resource private SubjectLogService subjectLogService;
+	@Resource private TeacherService teacherService;
 
 	/**
 	 * 课程列表-三层
@@ -137,7 +140,7 @@ public class CourseController {
 	}
 	
 	/**
-	 * 首页推荐
+	 * 课程首页推荐
 	 * @return
 	 */
 	@ResponseBody
@@ -159,6 +162,91 @@ public class CourseController {
 			return MapResult.failMap();
 		}
 	}
+	
+	/**
+	 * 视频课程首页（新）列表 二级课程
+	 * @param pid 1 数学 2 英语 3 逻辑 4 写作 5 面试
+	 * @param order 排序类型 1默认  2 热度 
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getVideoCourseList")
+	public Map<String, Object> getVideoCourseList(
+			@RequestParam(required = true) String pid,
+			@RequestParam(required = true) String order) {
+		try{
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			//首页推荐课程
+			JSONObject recommendObj = new JSONObject();
+			recommendObj.put("courseId", "34");
+			recommendObj.put("title", "导学课程");
+			recommendObj.put("profile", "课程介绍");
+			jsonObj.put("recommend", recommendObj);
+			
+			//首页精品课程
+			JSONObject chargeObj = new JSONObject();
+			chargeObj.put("title", "精品课程");
+			chargeObj.put("profile", "课程介绍");
+			jsonObj.put("charge", chargeObj);
+			
+			//课程列表
+			String orderType = "orderIndex";
+			if("2".equals(order)){
+				orderType = "playcount desc";
+			}
+			List<Course> courseList = courseService.getchildrenCour(pid, "2",orderType);
+			JSONArray jsonList = new JSONArray();
+			for (Course course : courseList) {
+				JSONObject jsonobj = JSONObject.fromObject(course, courCf);
+				if(!TextUtils.isEmpty(jsonobj.getString("teacherId"))){
+					Teacher teacher = teacherService.getTeacherById(jsonobj.getInt("teacherId"));
+					jsonobj.put("teacherName", teacher.getName());
+					jsonobj.put("teacherAvator", teacher.getAvatar());
+				}
+				jsonList.add(jsonobj);
+			}
+			jsonObj.put("courseList", jsonList);
+			
+			Map<String, Object> ret = MapResult.initMap();
+			ret.put("result", jsonObj);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
+	/**
+	 * 视频课程（新）列表 三级课程
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getVideoCourseSubList")
+	public Map<String, Object> getVideoCourseSubList(
+			@RequestParam(required = true) String pid) {
+		try{
+			Map<String, Object> ret = MapResult.initMap();
+			JSONObject courseObj = JSONObject.fromObject(courseService.getById(pid), courCf);
+			Teacher teacher = teacherService.getTeacherById(courseObj.getInt("teacherId"));
+			courseObj.put("teacherName", teacher.getName());
+			courseObj.put("teacherAvator", teacher.getAvatar());
+			List<Course> courseList = courseService.getchildrenCour(pid, "2","orderIndex");
+			JSONArray jsonList = new JSONArray();
+			for (Course course : courseList) {
+				JSONObject jsonobj = JSONObject.fromObject(course, courCf);
+				jsonList.add(jsonobj);
+			}
+			courseObj.put("child",jsonList);
+			ret.put("result", courseObj);
+			return ret;
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.failMap();
+		}
+	}
+	
 	/**
 	 * 知识型谱 （统计做题结果）旧版
 	 * @param userid	用户id
@@ -172,11 +260,11 @@ public class CourseController {
 			@RequestParam(required = true) String type) {
 		try{
 			Map<String, Object> ret = MapResult.initMap();
-			List<Course> topCourseList = courseService.getchildrenCour("0", type);
+			List<Course> topCourseList = courseService.getchildrenCour("0", type,"orderIndex");
 			JSONArray statisticsList = new JSONArray();
 			for(Course topCourse : topCourseList){
 				JSONObject statisticsObj = new JSONObject();
-				List<Course> courseList = courseService.getchildrenCour(topCourse.getId().toString(), type);
+				List<Course> courseList = courseService.getchildrenCour(topCourse.getId().toString(), type,"orderIndex");
 				JSONArray jsonList = new JSONArray();
 				for (Course course : courseList) {
 					JSONObject jsonobj = JSONObject.fromObject(course, courCf);
@@ -216,7 +304,7 @@ public class CourseController {
 		try{
 			Map<String, Object> ret = MapResult.initMap();
 			if("1".endsWith(type)){
-				List<Course> courseList = courseService.getchildrenCour(subjectType, "1");
+				List<Course> courseList = courseService.getchildrenCour(subjectType, "1","orderIndex");
 				JSONArray jsonList = new JSONArray();
 				for (Course course : courseList) {
 					JSONObject jsonobj = new JSONObject();
@@ -225,7 +313,7 @@ public class CourseController {
 					jsonobj.put("subAllNum", course.getSubAllNum());
 					int wrongNum = 0;
 					if (StringUtils.isNotBlank(userId)){
-						List<Course> subList = courseService.getchildrenCour(course.getId()+"", "1");
+						List<Course> subList = courseService.getchildrenCour(course.getId()+"", "1","orderIndex");
 						for(Course subCourse : subList){
 							wrongNum+=courseService.getHasDoneWrongSubNum(subCourse.getId(), userId, "1");
 						}

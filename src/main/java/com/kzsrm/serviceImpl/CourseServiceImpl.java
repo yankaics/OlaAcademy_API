@@ -50,13 +50,15 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	 * 查询pid下的所有子项
 	 * @param pid
 	 * @param type
+	 * @param orderType 排序类型
 	 * @return
 	 */
 	@Override
-	public List<Course> getchildrenCour(String pid, String type) {
+	public List<Course> getchildrenCour(String pid, String type,String orderType) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("pid", pid);
 		map.put("type", type);
+		map.put("orderType", orderType);
 		return courseDao.getchildrenCour(map);
 	}
 	
@@ -116,7 +118,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	}
 
 	/**
-     * 钻取多级课程
+     * 获取多级课程
      * @param pid
      * @return
      */
@@ -125,7 +127,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 		if (course != null){
 			JSONObject _course = JSONObject.fromObject(course, courCf);
 			Integer subNum = 0;// 已做题数
-			List<Course> courseList = getchildrenCour(course.getId()+"", type);
+			List<Course> courseList = getchildrenCour(course.getId()+"", type, "orderIndex");
 			if (courseList != null && courseList.size() > 0) {
 				JSONArray children = new JSONArray();
 				for (Course child : courseList){
@@ -164,7 +166,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	 */
 	@Override
 	public Integer getHasDoneRightSubNum(Integer cid, String userid, String type) {
-		List<Course> courseList = getchildrenCour(cid + "", type);
+		List<Course> courseList = getchildrenCour(cid + "", type,"orderIndex");
 		if (courseList != null && courseList.size() > 0) {
 			int i = 0;
 			for (Course course : courseList)
@@ -187,7 +189,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	 */
 	@Override
 	public Integer getHasDoneWrongSubNum(Integer cid, String userid, String type) {
-		List<Course> courseList = getchildrenCour(cid + "", type);
+		List<Course> courseList = getchildrenCour(cid + "", type,"orderIndex");
 		if (courseList != null && courseList.size() > 0) {
 			int i = 0;
 			for (Course course : courseList)
@@ -209,7 +211,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	@Override
 	public int refreshSubAllNum(String pid, String type) {
 		int num = 0;
-		List<Course> courseList = getchildrenCour(pid, null);// 暂不考虑type
+		List<Course> courseList = getchildrenCour(pid, null,"orderIndex");// 暂不考虑type
 		if (courseList != null && courseList.size() > 0) {
 			for (Course course : courseList) {
 				int tmp = refreshSubAllNum(course.getId()+"", type);
@@ -242,7 +244,7 @@ public class CourseServiceImpl extends BaseServiceMybatisImpl<Course, String> im
 	 */
 	@Override
 	public List<Subject> getWrongSubSet(String userid, String cid, String type) {
-		List<Course> courseList = getchildrenCour(cid, type);
+		List<Course> courseList = getchildrenCour(cid, type,"orderIndex");
 		if (courseList != null && courseList.size() > 0) {
 			List<Subject> ret = new ArrayList<Subject>();
 			for (Course course : courseList) {
