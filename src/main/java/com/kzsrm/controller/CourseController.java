@@ -181,14 +181,14 @@ public class CourseController {
 			//首页推荐课程
 			JSONObject recommendObj = new JSONObject();
 			recommendObj.put("courseId", "34");
-			recommendObj.put("title", "导学课程");
-			recommendObj.put("profile", "课程介绍");
+			recommendObj.put("title", "导学单科突破");
+			recommendObj.put("profile", "独家大纲解析");
 			jsonObj.put("recommend", recommendObj);
 			
 			//首页精品课程
 			JSONObject chargeObj = new JSONObject();
-			chargeObj.put("title", "精品课程");
-			chargeObj.put("profile", "课程介绍");
+			chargeObj.put("title", "真题名家详解");
+			chargeObj.put("profile", "必会题型全覆盖");
 			jsonObj.put("charge", chargeObj);
 			
 			//课程列表

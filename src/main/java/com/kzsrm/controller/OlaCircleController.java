@@ -139,6 +139,13 @@ public class OlaCircleController {
 						jsonObj.put("imageGids", circle.getImageGids());
 						jsonObj.put("location", circle.getLocation());
 						jsonObj.put("praiseNumber", praiseService.queryPraiseNumber(circle.getId()+""));
+						int isPraised = 0;
+						if(!TextUtils.isEmpty(userId)){
+							if(praiseService.queryIsPraised(userId, circle.getId()+"")){
+								isPraised = 1;
+							}
+						}
+						jsonObj.put("isPraised", isPraised);
 						jsonObj.put("readNumber", circle.getReadNumber());
 						jsonObj.put("commentNumber",circle.getCommentNumber());
 						cicleList.add(jsonObj);
@@ -185,7 +192,7 @@ public class OlaCircleController {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
 			jsonobj.put("time", sdf.format(circle.getCreateTime()));
-			List<Comment> commentList = commentService.getCommentList(Integer.parseInt(circleId), 2);
+			List<Comment> commentList = commentService.getCommentList(Integer.parseInt(circleId), 2,"");
 			JSONArray commentArray = new JSONArray();
 			for(Comment comment:commentList){
 				JSONObject commentJson = JSONObject.fromObject(comment, commentJC);

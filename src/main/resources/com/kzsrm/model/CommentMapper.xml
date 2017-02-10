@@ -27,6 +27,9 @@
 	from comment 
 	where postId = #{postId,jdbcType=INTEGER}
 	and type = #{type,jdbcType=INTEGER}
+	<if test="userId != null and userId != ''">
+    	and userId = #{userId,jdbcType=INTEGER}
+   	</if>
 	order by createTime desc
   </select>
   

@@ -11,6 +11,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -92,10 +93,21 @@ public class CommentController {
 	@RequestMapping(value = "/getCommentList")
 	public Map<String, Object> getCommentList(
 			@RequestParam(required = true) int postId,
-			@RequestParam(required = true) int type) {
+			@RequestParam(required = true) int type,
+			@RequestParam(defaultValue = "0") int assign) {
 		try {
 			Map<String, Object> ret = MapResult.initMap();
-			List<Comment> commentList = commentService.getCommentList(postId, type);
+			// 指定回答
+			String userId = "";
+			if(assign==1){
+				OlaCircle circle = circleService.getById(postId+"");
+				if(!TextUtils.isEmpty(circle.getAssignUser())){
+					userId = circle.getAssignUser();
+				}else{
+					userId = "0";
+				}
+			}
+			List<Comment> commentList = commentService.getCommentList(postId, type,userId);
 			JSONArray jsonArray = new JSONArray();
 			for (Comment comment : commentList) {
 				User user = userService.selectUser(comment.getUserId());

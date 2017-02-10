@@ -40,13 +40,15 @@ public class CommentServiceImpl extends BaseServiceMybatisImpl<Comment, String> 
 	 * 评论列表
 	 * @param postId 课程或帖子Id
 	 * @param type 1 课程Id 2 帖子Id
+	 * @param userId 指定回答用户的Id
 	 * @author tianxiaopeng
 	 * @return
 	 */
-	public List<Comment> getCommentList(int postId, int type){
+	public List<Comment> getCommentList(int postId, int type,String userId){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("postId", postId);
 		map.put("type", type);
+		map.put("userId", userId);
 		return commentDao.getCommentList(map);
 	}
 	

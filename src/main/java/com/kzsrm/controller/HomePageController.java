@@ -105,7 +105,7 @@ public class HomePageController {
 					jsonObj.put("studyDay", u.getLearndays());
 				}
 				jsonObj.put("finishCount", u.getAnswerNum());
-				jsonObj.put("defeatPercent", userService.getUesrDefeatPercent(userId)+"%");
+				jsonObj.put("defeatPercent", (userService.getUesrDefeatPercent(userId)<=80?userService.getUesrDefeatPercent(userId):80)+"%");
 			}
 			jsonObj.put("bannerList",bannerArray);
 			jsonObj.put("questionList",questionArray);
