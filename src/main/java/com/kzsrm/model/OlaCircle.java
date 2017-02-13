@@ -8,6 +8,7 @@ public class OlaCircle {
 	private Integer userId;
 	private String title;
 	private String content;
+	private String subject; //科目
 	private String imageGids;
 	private String location;
 	private Integer courseId;
@@ -39,6 +40,12 @@ public class OlaCircle {
 	}
 	public String getContent() {
 		return content;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 	public void setContent(String content) {
 		this.content = content;

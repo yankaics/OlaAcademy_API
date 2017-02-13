@@ -67,6 +67,7 @@ public class OlaCircleController {
 			@RequestParam(required = true) int userId,
 			@RequestParam(required = false) String title,
 			@RequestParam(required = false) String content,
+			@RequestParam(defaultValue = "其他") String subject,
 			@RequestParam(required = false) String imageGids,
 			@RequestParam(required = false) String assignUser,
 			@RequestParam(defaultValue="1") int isPublic,
@@ -75,6 +76,7 @@ public class OlaCircleController {
 		circle.setUserId(userId);
 		circle.setTitle(title);
 		circle.setContent(content);
+		circle.setSubject(subject);
 		circle.setImageGids(imageGids);
 		circle.setLocation(location);
 		circle.setAssignUser(assignUser);
@@ -136,6 +138,7 @@ public class OlaCircleController {
 					} else if (circle.getType() == 2) {
 						jsonObj.put("title", circle.getTitle());
 						jsonObj.put("content", circle.getContent());
+						jsonObj.put("subject", circle.getSubject());
 						jsonObj.put("imageGids", circle.getImageGids());
 						jsonObj.put("location", circle.getLocation());
 						jsonObj.put("praiseNumber", praiseService.queryPraiseNumber(circle.getId()+""));

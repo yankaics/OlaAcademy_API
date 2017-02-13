@@ -6,6 +6,7 @@
     <result column="userId" property="userId" jdbcType="INTEGER" />
     <result column="title" property="title" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="subject" property="subject" jdbcType="VARCHAR" />
     <result column="imageGids" property="imageGids" jdbcType="VARCHAR" />
     <result column="location" property="location" jdbcType="VARCHAR" />
     <result column="courseId" property="courseId" jdbcType="INTEGER" />
@@ -19,7 +20,7 @@
     <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, userId, title, content, imageGids, location, courseId, videoId, praiseNumber, readNumber,commentNumber,assignUser, isPublic, type, createTime
+    id, userId, title, content,subject, imageGids, location, courseId, videoId, praiseNumber, readNumber,commentNumber,assignUser, isPublic, type, createTime
   </sql>
   
   <!-- 发布的贴 -->
@@ -85,10 +86,10 @@
      and courseId = #{courseId,jdbcType=VARCHAR}
   </select>
   <insert id="insert" parameterType="com.kzsrm.model.OlaCircle" >
-    insert into olacircle (id, userId,title,content,imageGids,location, videoId,
+    insert into olacircle (id, userId,title,content,subject,imageGids,location, videoId,
       courseId, assignUser, isPublic, type, createTime)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
-    #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{imageGids,jdbcType=VARCHAR},#{location,jdbcType=VARCHAR},  
+    #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},#{subject,jdbcType=VARCHAR}, #{imageGids,jdbcType=VARCHAR},#{location,jdbcType=VARCHAR},  
      #{videoId,jdbcType=INTEGER},  #{courseId,jdbcType=INTEGER},#{assignUser,jdbcType=VARCHAR},#{isPublic,jdbcType=INTEGER},
      #{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
