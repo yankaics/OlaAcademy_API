@@ -69,6 +69,7 @@ public class PayController {
 	private static int yearPrice1 = 298;
 	
 	private static int monthPrice2 = 38;
+	private static int seasonPrice = 98;
 	private static int halfYearPrice2 = 198;
 	private static int yearPrice2 = 398;
 			
@@ -95,7 +96,7 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.3.0");
+		jsonObj.put("version", "1.3.2");
 		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;
@@ -112,6 +113,7 @@ public class PayController {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
 		jsonObj.put("monthPrice", monthPrice2);
+		jsonObj.put("seasonPrice", seasonPrice);
 		jsonObj.put("halfYearPrice", halfYearPrice2);
 		jsonObj.put("yearPrice", yearPrice2);
 		ret.put("result", jsonObj);
@@ -120,7 +122,7 @@ public class PayController {
 
 	/**
 	 * 支付宝订单信息
-	 * type 1 月会员 2 半年会员 3 商品 4 年会员 5 欧拉币
+	 * type 1 月会员 2 半年会员 3 商品 4 年会员 5 季度会员
 	 * 
 	 * @return
 	 */
@@ -159,7 +161,10 @@ public class PayController {
 				body = goodsService.getById(goodsId).getName();
 			}else if (type.equals("4")) { //年度会员
 				price = (TextUtils.isEmpty(app_version)?yearPrice1:yearPrice2)+"";
+			}else if (type.equals("5")) { //季度会员
+				price = seasonPrice+"";
 			}
+			
 
 			String orderInfo = AlipayCore.getOrderInfo(body, "订单号："
 					+ out_trade_no, price, out_trade_no);
@@ -233,6 +238,9 @@ public class PayController {
 			parameters.put("body", goodsService.getById(goodsId).getName());
 		}else if (type.equals("4")) { //年度会员
 			parameters.put("total_fee", (TextUtils.isEmpty(app_version)?yearPrice1:yearPrice2)*100+"");
+			parameters.put("body", "欧拉会员");
+		}else if (type.equals("5")) { //年度会员
+			parameters.put("total_fee", seasonPrice*100+"");
 			parameters.put("body", "欧拉会员");
 		}
 
@@ -525,6 +533,8 @@ public class PayController {
 					c.add(Calendar.MONTH, 6);
 				}else if (orderInfo.getType() == 4) {
 					c.add(Calendar.MONTH, 12);
+				}else if (orderInfo.getType() == 5) {
+					c.add(Calendar.MONTH, 3);
 				}
 			} else {
 				c.setTimeInMillis(user.getVipTime().getTime()); // 会员有效日期
@@ -534,6 +544,8 @@ public class PayController {
 					c.add(Calendar.MONTH, 6);
 				}else if (orderInfo.getType() == 4) {
 					c.add(Calendar.MONTH, 12);
+				}else if (orderInfo.getType() == 5) {
+					c.add(Calendar.MONTH, 3);
 				}
 			}
 			// 首次购买会员赠送100欧拉币
