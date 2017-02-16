@@ -96,7 +96,7 @@ public class PayController {
 	public Map<String, Object> showPayModuleWithVersion() throws Exception {
 		Map<String, Object> ret = MapResult.initMap();
 		JSONObject jsonObj = new JSONObject();
-		jsonObj.put("version", "1.3.2");
+		jsonObj.put("version", "1.3.3");
 		jsonObj.put("thirdPay", "0");
 		ret.put("result", jsonObj);
 		return ret;
@@ -134,6 +134,10 @@ public class PayController {
 			@RequestParam(required = true) String goodsId,
 			@RequestParam(required = false) String app_version,
 			@RequestParam(defaultValue="0") int coin) throws Exception {
+		
+		if(type.equals("0")){ //解决前端传值错误问题
+			type = "1";
+		}
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
 		if(type.equals("3")&&coin>0&&Integer.parseInt(u.getCoin())<coin){
@@ -202,6 +206,10 @@ public class PayController {
 			@RequestParam(required = true) String goodsId,
 			@RequestParam(required = false) String app_version,
 			@RequestParam(defaultValue="0") int coin) throws Exception {
+		
+		if(type.equals("0")){ //解决前端传值错误问题
+			type = "1";
+		}
 		
 		User u = userService.selectUser(Integer.parseInt(userId));
 		if(type.equals("3")&&coin>0&&Integer.parseInt(u.getCoin())<coin){
