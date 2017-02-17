@@ -27,6 +27,11 @@ import com.kzsrm.service.CourseService;
 import com.kzsrm.service.OlaCircleService;
 import com.kzsrm.service.UserService;
 import com.kzsrm.utils.MapResult;
+import com.push.AndroidNotification;
+import com.push.PushClient;
+import com.push.PushConfig;
+import com.push.android.AndroidCustomizedcast;
+import com.push.ios.IOSCustomizedcast;
 
 @Controller
 @RequestMapping("/comment")
@@ -34,7 +39,7 @@ public class CommentController {
 	
 	private static Logger logger = LoggerFactory
 			.getLogger(CourseController.class);
-
+	
 	@Resource
 	private UserService userService;
 	@Resource
@@ -43,9 +48,11 @@ public class CommentController {
 	private CommentService commentService;
 	@Resource
 	private OlaCircleService circleService;
+	
+	private PushClient client = new PushClient();
 
 	/**
-	 * 欧拉圈发帖
+	 * 添加评论
 	 * 
 	 * @return
 	 */
@@ -76,12 +83,49 @@ public class CommentController {
 		comment.setCreateTime(new Date());
 		try {
 			commentService.addComment(comment);
+			// 友盟推送消息
+			OlaCircle circle = circleService.getById(postId+"");
+			String pushUserId = circle.getUserId()+"";
+			if(!TextUtils.isEmpty(toUserId)){
+				pushUserId = toUserId;
+			}
+			User u = userService.selectUser(Integer.parseInt(pushUserId));
+			sendIOSCustomizedcast(u.getName(),u.getPhone());
+			sendAndroidCustomizedcast(u.getName(),u.getPhone());
 			return MapResult.initMap();
 		} catch (Exception e) {
 			// TODO: handle exception
 			logger.error("", e);
 			return MapResult.failMap();
 		}
+	}
+	
+	private void sendAndroidCustomizedcast(String userName,String phone) throws Exception {
+		AndroidCustomizedcast customizedcast = new AndroidCustomizedcast(PushConfig.APP_KEY, PushConfig.APP_SECRECT);
+		// TODO Set your alias here, and use comma to split them if there are multiple alias.
+		// And if you have many alias, you can also upload a file containing these alias, then 
+		// use file_id to send customized notification.
+		customizedcast.setAlias(phone, "USR_PHONE");
+		customizedcast.setTicker("欧拉圈留言");
+		customizedcast.setTitle("欧拉学院");
+		customizedcast.setText("您收到一条来自"+userName+"的留言");
+		customizedcast.goAppAfterOpen();
+		customizedcast.setDisplayType(AndroidNotification.DisplayType.NOTIFICATION);
+		// TODO Set 'production_mode' to 'false' if it's a test device. 
+		// For how to register a test device, please see the developer doc.
+		customizedcast.setProductionMode();
+		client.send(customizedcast);
+	}
+	
+	private void sendIOSCustomizedcast(String userName,String phone) throws Exception {
+		IOSCustomizedcast customizedcast = new IOSCustomizedcast(PushConfig.APP_KEY, PushConfig.APP_SECRECT);
+		customizedcast.setAlias(phone, "USER_PHONE");
+		customizedcast.setAlert("您收到一条来自"+userName+"的留言");
+		customizedcast.setBadge(1);
+		customizedcast.setSound("default");
+		customizedcast.setCustomizedField("type", "5");
+		customizedcast.setProductionMode();
+		client.send(customizedcast);
 	}
 
 	/**
