@@ -39,6 +39,9 @@ public class User {
 	private String learntime;  //上次学习时间
 	private String learndays; // 累计学习天数 允许间断
 	private String answerNum; //已做题数
+	private String wechatId; //第三方登陆Id
+	private String qqId;
+	private String sinaId;
 
 	public String getRealName() {
 		return realName;
@@ -254,6 +257,30 @@ public class User {
 
 	public void setAnswerNum(String answerNum) {
 		this.answerNum = answerNum;
+	}
+	
+	public String getWechatId() {
+		return wechatId;
+	}
+
+	public void setWechatId(String wechatId) {
+		this.wechatId = wechatId;
+	}
+
+	public String getQqId() {
+		return qqId;
+	}
+
+	public void setQqId(String qqId) {
+		this.qqId = qqId;
+	}
+
+	public String getSinaId() {
+		return sinaId;
+	}
+
+	public void setSinaId(String sinaId) {
+		this.sinaId = sinaId;
 	}
 
 	@Override

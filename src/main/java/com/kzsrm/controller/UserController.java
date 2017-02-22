@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONArray;
 
+import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -102,7 +103,7 @@ public class UserController extends SimpleFormController {
 						u.setName("小欧"+phone.substring(7, 11));
 						u.setRegtime(new Date());
 						u.setPasswd(MD5.md5(passwd));
-						u.setRegtime(new Date());
+						u.setVipTime(new Date());
 						u.setSignIntime(new Date());
 						u.setSignIndays("1");
 						u.setCoin("20");
@@ -176,6 +177,109 @@ public class UserController extends SimpleFormController {
 			return MapResult.initMap(ApiCode.PARG_ERR, "用户名或密码错误");
 		} else {
 			return maps;
+		}
+	}
+	
+	/**
+	 * 第三方登陆
+	 * @return 已绑定手机，返回用户基本信息
+	 * 		   未绑定手机，返回成功后，app端进入绑定手机号页面
+	 */
+	@RequestMapping(value = "/loginBySDK")
+	@ResponseBody
+	public Map<String, Object> loginBySDK(@RequestParam(required = true) String sourceId,
+			@RequestParam(required = true) String source) throws ParseException {
+		Map<String, Object> result = MapResult.initMap();
+		result.put("data", userService.getUserByThirdId(source, sourceId));
+		return result;
+	}
+	
+	/**
+	 * 第三方登陆绑定手机号
+	 */
+	@RequestMapping(value = "/bindPhoneWithSDK")
+	@ResponseBody
+	public Map<String, Object> bindPhoneWithSDK(
+			@RequestParam(required = true) String phone,@RequestParam(required = true) String code,
+			@RequestParam(required = false) String name,@RequestParam(required = false) String avator,
+			@RequestParam(required = false) String sex,@RequestParam(required = true) String source,
+			@RequestParam(required = true) String sourceId) throws ParseException {
+		
+		// 获取最新验证码
+		Yzm yzmList = null;
+		try {
+			Map<String, Object> map = userService.selectUniqueUser(phone);
+			if (map.get("data") == null) { // 不存在 － 注册新账号
+				yzmList = userService.getYzm(phone);
+				if (yzmList == null) {
+					return MapResult.initMap(ApiCode.PARG_ERR, "没有发送验证码");
+				} else {
+					Date d = yzmList.getRegtime();
+					String date = Tools.ymdhms.format(d);
+					boolean isCodeInvalid = false;
+					User u = new User();
+					try {
+						isCodeInvalid = Tools.codeInvalid(date, 1);
+					} catch (ParseException e) {
+						logger.error("", e);
+						e.printStackTrace();
+					}
+					if (isCodeInvalid == true) {
+						return MapResult.initMap(ApiCode.PARG_ERR, "验证码已过期");
+					} else {
+						code = code.trim();
+						System.out.println("code  " + code + "|||");
+						if (!yzmList.getYzm().trim().equals(code)) {
+							return MapResult.initMap(ApiCode.PARG_ERR, "验证码输入有误");
+						}
+						u.setPhone(phone);
+						u.setAvator(avator);
+						u.setSex(sex);
+						u.setName(TextUtils.isEmpty(name)?("小欧"+phone.substring(7, 11)):name);
+						u.setRegtime(new Date());
+						u.setPasswd(MD5.md5("123456"));
+						u.setVipTime(new Date());
+						u.setSignIntime(new Date());
+						u.setSignIndays("1");
+						u.setCoin("20");
+						u.setIsActive(1);// 学生
+						if(source.equals("wechat")){
+							u.setWechatId(sourceId);
+						}else if(source.equals("QQ")){
+							u.setQqId(sourceId);
+						}else if(source.equals("sinaMicroblog")){
+							u.setSinaId(sourceId);
+						}
+						Map<String, Object> maps = userService.insertUser(u);
+						Map<String, Object> result = MapResult.initMap();
+						if (Integer.parseInt(maps.get("data").toString()) == 1) {
+							updateCoinHistroty("新用户注册",u.getId(),3,20); //注册获得欧拉币
+							updateCoinHistroty("每日签到",u.getId(),1,5); //签到获得欧拉币
+							result = MapResult.initMap();
+						} else {
+							result = MapResult.failMap();
+						}
+						result.put("data", u);
+						return result;
+					}
+				}
+			} else { // 存在 绑定
+				Map<String, Object> result = MapResult.initMap();
+				User user = (User)map.get("data");
+				if(source.equals("wechat")){
+					user.setWechatId(sourceId);
+				}else if(source.equals("QQ")){
+					user.setQqId(sourceId);
+				}else if(source.equals("sinaMicroblog")){
+					user.setSinaId(sourceId);
+				}
+				userService.updateUser(user);
+				result.put("data", user);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("", e);
+			return MapResult.initMap(ApiCode.PARG_ERR, "参数错误");
 		}
 	}
 	

@@ -74,6 +74,29 @@ public class UserDao<E> extends BaseMybatisDao<User, Integer> {
 		return this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getUserBySessionId", map);
 	}
 	
+	public void bindPhontWithSDK(Map<String,Object> map) {
+		this.getSqlSession().insert(this.getMybatisMapperNamesapce() + ".insert", map);
+	}
+	
+	/**
+	 * 第三方账号绑定
+	 * @param source
+	 * @param sourceId
+	 * @return
+	 */
+	public User getUserByThirdId(String source,String sourceId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(source.equals("wechat")){
+			map.put("wechatId", sourceId);
+		}else if(source.equals("QQ")){
+			map.put("qqId", sourceId);
+		}else if(source.equals("sinaMicroblog")){
+			map.put("sinaId", sourceId);
+		}
+		User user = this.getSqlSession().selectOne(this.getMybatisMapperNamesapce() + ".getUserByThirdId", map);
+		return user;
+	}
+	
 	public int updateVIPTime(int userId,Date vipTime){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("id", userId);

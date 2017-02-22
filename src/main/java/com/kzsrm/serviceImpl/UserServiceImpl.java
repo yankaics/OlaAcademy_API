@@ -79,7 +79,12 @@ public class UserServiceImpl extends BaseServiceMybatisImpl<User, Integer>implem
 		map.put("data", user);
 		return map;
 	}
-
+	
+	@Override
+	public User getUserByThirdId(String source,String sourceId) {
+		return  this.userDao.getUserByThirdId(source, sourceId);
+	}
+	
 	@Override
 	public int insertYZM(User user) {
 		return this.userDao.insertYZM(user);

@@ -88,6 +88,7 @@ public class VideoServiceImpl extends BaseServiceMybatisImpl<Video, String>
 				circle.setCourseId(Integer.parseInt(pointId));
 				circle.setIsPublic(1);
 				circle.setType(1);
+				circle.setSubject("其他");
 				circle.setCreateTime(new Date());
 				if(videoList.size()>0){
 					circle.setVideoId(videoList.get(0).getId());;

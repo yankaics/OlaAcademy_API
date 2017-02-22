@@ -16,7 +16,15 @@ public interface UserService {
 	public Map<String, Object> updateUser(User user);
 
 	public Map<String, Object> selectUniqueUser(String phone);
-
+	
+	/**
+	 * 根据第三方登陆 Id 查询用户
+	 * @param source
+	 * @param sourceId
+	 * @return
+	 */
+	public User getUserByThirdId(String source,String sourceId);
+	
 	public int insertYZM(User user);
 
 	public Yzm getYzm(String phone);
